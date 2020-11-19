@@ -35,28 +35,28 @@
 #define __INTSET_H
 #include <stdint.h>
 
-//zw µ×²ã±¾ÖÊÊÇÒ»¸öÓĞĞòµÄ£¨Ğ¡µ½´ó£©¡¢²»ÖØ¸´µÄ¡¢ÕûĞÍµÄÊı×é£¬Ö§³Ö²»Í¬ÀàĞÍÕûÊı
+//zw åº•å±‚æœ¬è´¨æ˜¯ä¸€ä¸ªæœ‰åºçš„ï¼ˆå°åˆ°å¤§ï¼‰ã€ä¸é‡å¤çš„ã€æ•´å‹çš„æ•°ç»„ï¼Œæ”¯æŒä¸åŒç±»å‹æ•´æ•°
 typedef struct intset {
-    uint32_t encoding;      //zw ËùÊ¹ÓÃÀàĞÍµÄ³¤¶È£¬4\8\16 
-    uint32_t length;        //zw ÔªËØ¸öÊı
-    int8_t contents[];      //zw ±£´æÔªËØµÄÊı×é
+    uint32_t encoding;      //zw æ‰€ä½¿ç”¨ç±»å‹çš„é•¿åº¦ï¼Œ4\8\16 
+    uint32_t length;        //zw å…ƒç´ ä¸ªæ•°
+    int8_t contents[];      //zw ä¿å­˜å…ƒç´ çš„æ•°ç»„
 } intset;
 
-//zw ĞÂ½¨intset
+//zw æ–°å»ºintset
 intset *intsetNew(void);
-//zw Ö±½ÓÌí¼ÓÔªËØ
+//zw ç›´æ¥æ·»åŠ å…ƒç´ 
 intset *intsetAdd(intset *is, int64_t value, uint8_t *success);
-//zw É¾³ıÔªËØ
+//zw åˆ é™¤å…ƒç´ 
 intset *intsetRemove(intset *is, int64_t value, int *success);
-//zw ²éÕÒÔªËØ
+//zw æŸ¥æ‰¾å…ƒç´ 
 uint8_t intsetFind(intset *is, int64_t value);
-//zw Ëæ»ú·µ»ØÒ»¸öintsetÖĞÔªËØ
+//zw éšæœºè¿”å›ä¸€ä¸ªintsetä¸­å…ƒç´ 
 int64_t intsetRandom(intset *is);
-//zw ¸ù¾İË÷Òı»ñÈ¡ÕûÊıÖµ
+//zw æ ¹æ®ç´¢å¼•è·å–æ•´æ•°å€¼
 uint8_t intsetGet(intset *is, uint32_t pos, int64_t *value);
-//zw intsetÖĞÔªËØµÄ¸öÊı
+//zw intsetä¸­å…ƒç´ çš„ä¸ªæ•°
 uint32_t intsetLen(intset *is);
-//zw intsetËùÕ¼µÄ×Ö½ÚÊı
+//zw intsetæ‰€å çš„å­—èŠ‚æ•°
 size_t intsetBlobLen(intset *is);
 
 #endif // __INTSET_H

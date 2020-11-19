@@ -47,23 +47,23 @@
 #undef ip_len
 #endif
 
-//zw TCPµÄÄ¬ÈÏÁ¬½Ó
+//zw TCPçš„é»˜è®¤è¿æ¥
 int anetTcpConnect(char *err, char *addr, int port);
-//zw TCPµÄ·Ç×èÈûÁ¬½Ó
+//zw TCPçš„éé˜»å¡è¿æ¥
 int anetTcpNonBlockConnect(char *err, char *addr, int port);
 
 int anetTcpNonBlockBindConnect(char *err, char *addr, int port, char *source_addr);
 
 int anetTcpNonBlockBestEffortBindConnect(char *err, char *addr, int port, char *source_addr);
-//zw anetµÄUnix·½Ê½µÄÄ¬ÈÏÁ¬½Ó·½Ê½
+//zw anetçš„Unixæ–¹å¼çš„é»˜è®¤è¿æ¥æ–¹å¼
 int anetUnixConnect(char *err, char *path);
-//zw anetµÄUnix·½Ê½µÄ·Ç×èÈûÁ¬½Ó·½Ê½
+//zw anetçš„Unixæ–¹å¼çš„éé˜»å¡è¿æ¥æ–¹å¼
 int anetUnixNonBlockConnect(char *err, char *path);
-//zw anetÍøÂç¶ÁÈ¡ÎÄ¼şµ½bufferÖĞ²Ù×÷
+//zw anetç½‘ç»œè¯»å–æ–‡ä»¶åˆ°bufferä¸­æ“ä½œ
 int anetRead(int fd, char *buf, int count);
-//zw ½âÎöËùÓĞµÄ¶«Î÷
+//zw è§£ææ‰€æœ‰çš„ä¸œè¥¿
 int anetResolve(char *err, char *host, char *ipbuf, size_t ipbuf_len);
-//zw µ¥µ¥½âÎöIPµÄµØÖ·
+//zw å•å•è§£æIPçš„åœ°å€
 int anetResolveIP(char *err, char *host, char *ipbuf, size_t ipbuf_len);
 //zw anet TCP IP4 Server
 int anetTcpServer(char *err, int port, char *bindaddr, int backlog);
@@ -75,25 +75,25 @@ int anetUnixServer(char *err, char *path, mode_t perm, int backlog);
 int anetTcpAccept(char *err, int serversock, char *ip, size_t ip_len, int *port);
 //zw anet Unix Accept
 int anetUnixAccept(char *err, int serversock);
-//zw anetÍ¨¹ıÍøÂç´ÓbufferÖĞĞ´ÈëÎÄ¼ş²Ù×÷
+//zw aneté€šè¿‡ç½‘ç»œä»bufferä¸­å†™å…¥æ–‡ä»¶æ“ä½œ
 int anetWrite(int fd, char *buf, int count);
-//zw anetÉèÖÃ·Ç×èÈûµÄ·½·¨
+//zw anetè®¾ç½®éé˜»å¡çš„æ–¹æ³•
 int anetNonBlock(char *err, int fd);
-//zw anetÉèÖÃ×èÈûµÄ·½·¨
+//zw anetè®¾ç½®é˜»å¡çš„æ–¹æ³•
 int anetBlock(char *err, int fd);
-//zw ÆôÓÃTCPÃ»ÓĞÑÓ³Ù
+//zw å¯ç”¨TCPæ²¡æœ‰å»¶è¿Ÿ
 int anetEnableTcpNoDelay(char *err, int fd);
-//zw ½ûÓÃTCPÁ¬½ÓÃ»ÓĞÑÓ³Ù
+//zw ç¦ç”¨TCPè¿æ¥æ²¡æœ‰å»¶è¿Ÿ
 int anetDisableTcpNoDelay(char *err, int fd);
-//zw ÉèÖÃTCP±£³Ö»îÔ¾Á¬½Ó×´Ì¬£¬ÊÊÓÃÓÚËùÓĞÏµÍ³
+//zw è®¾ç½®TCPä¿æŒæ´»è·ƒè¿æ¥çŠ¶æ€ï¼Œé€‚ç”¨äºæ‰€æœ‰ç³»ç»Ÿ
 int anetTcpKeepAlive(char *err, int fd);
-//zw ÉèÖÃ·¢ËÍ³¬Ê±Ê±¼ä
+//zw è®¾ç½®å‘é€è¶…æ—¶æ—¶é—´
 int anetSendTimeout(char *err, int fd, long long ms);
-//zw ¸ù¾İfd »ñÈ¡Ô¶¶Ësocket ipºÍport
+//zw æ ¹æ®fd è·å–è¿œç«¯socket ipå’Œport
 int anetPeerToString(int fd, char *ip, size_t ip_len, int *port);
-//zw ÉèÖÃTCPÁ¬½ÓÒ»Ö±´æ»î£¬ÓÃÀ´¼ì²âÒÑ¾­ËÀÈ¥µÄ½áµã£¬intervalÑ¡ÏîÖ»ÊÊÓÃÓÚLinuxÏÂµÄÏµÍ³
+//zw è®¾ç½®TCPè¿æ¥ä¸€ç›´å­˜æ´»ï¼Œç”¨æ¥æ£€æµ‹å·²ç»æ­»å»çš„ç»“ç‚¹ï¼Œintervalé€‰é¡¹åªé€‚ç”¨äºLinuxä¸‹çš„ç³»ç»Ÿ
 int anetKeepAlive(char *err, int fd, int interval);
-//zw ¸ù¾İfd »ñÈ¡±¾µØsocket ipºÍport
+//zw æ ¹æ®fd è·å–æœ¬åœ°socket ipå’Œport
 int anetSockName(int fd, char *ip, size_t ip_len, int *port);
 
 #endif

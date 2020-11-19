@@ -37,7 +37,7 @@
 /* Check the length of a number of objects to see if we need to convert a
  * ziplist to a real hash. Note that we only check string encoded objects
  * as their string length can be queried in constant time. */
-//zw µ±hashTypeÎªziplistÊ±£¬ÅĞ¶Ï¶ÔÏó³¤¶ÈÊÇ·ñ³¬³öÁË·şÎñ¶Ë¿É½ÓÊÜµÄziplist×î´ó³¤¶È£¬³¬¹ıÔò×ª³É¹şÏ£×ÖµäÀàĞÍ
+//zw å½“hashTypeä¸ºziplistæ—¶ï¼Œåˆ¤æ–­å¯¹è±¡é•¿åº¦æ˜¯å¦è¶…å‡ºäº†æœåŠ¡ç«¯å¯æ¥å—çš„ziplistæœ€å¤§é•¿åº¦ï¼Œè¶…è¿‡åˆ™è½¬æˆå“ˆå¸Œå­—å…¸ç±»å‹
 void hashTypeTryConversion(robj *o, robj **argv, int start, int end) {
     int i;
 
@@ -54,7 +54,7 @@ void hashTypeTryConversion(robj *o, robj **argv, int start, int end) {
 }
 
 /* Encode given objects in-place when the hash uses a dict. */
-//zw µ±robjÓÃµÄÊÇ×ÖµäµÄ±àÂë·½Ê½µÄÊ±ºò£¬Ôò¾­¹ı±àÂë×ª»»
+//zw å½“robjç”¨çš„æ˜¯å­—å…¸çš„ç¼–ç æ–¹å¼çš„æ—¶å€™ï¼Œåˆ™ç»è¿‡ç¼–ç è½¬æ¢
 void hashTypeTryObjectEncoding(robj *subject, robj **o1, robj **o2) {
     if (subject->encoding == REDIS_ENCODING_HT) {
         if (o1) *o1 = tryObjectEncoding(*o1);
@@ -64,7 +64,7 @@ void hashTypeTryObjectEncoding(robj *subject, robj **o1, robj **o2) {
 
 /* Get the value from a ziplist encoded hash, identified by field.
  * Returns -1 when the field cannot be found. */
-//zw »ñÈ¡ziplistÑ¹ËõÁĞ±íÖĞµÄÄ³¸öË÷ÒıÎ»ÖÃÉÏµÄÖµ
+//zw è·å–ziplistå‹ç¼©åˆ—è¡¨ä¸­çš„æŸä¸ªç´¢å¼•ä½ç½®ä¸Šçš„å€¼
 int hashTypeGetFromZiplist(robj *o, robj *field,
                            unsigned char **vstr,
                            unsigned int *vlen,

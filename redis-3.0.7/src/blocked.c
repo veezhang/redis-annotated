@@ -73,7 +73,7 @@
  * Note that if the timeout is zero (usually from the point of view of
  * commands API this means no timeout) the value stored into 'timeout'
  * is zero. */
-//zw ¹ıÈ¥³¬Ê±Ê±¼ä£¨ºÁÃë£©£¬ 0±êÊ¶²»³¬Ê±£¬
+//zw è¿‡å»è¶…æ—¶æ—¶é—´ï¼ˆæ¯«ç§’ï¼‰ï¼Œ 0æ ‡è¯†ä¸è¶…æ—¶ï¼Œ
 int getTimeoutFromObjectOrReply(redisClient *c, robj *object, mstime_t *timeout, int unit) {
     long long tval;
 
@@ -98,7 +98,7 @@ int getTimeoutFromObjectOrReply(redisClient *c, robj *object, mstime_t *timeout,
 /* Block a client for the specific operation type. Once the REDIS_BLOCKED
  * flag is set client query buffer is not longer processed, but accumulated,
  * and will be processed when the client is unblocked. */
-//zw ÉèÖÃ¿Í»§¶Ë×èÈû£¬´ËÊ±ÇëÇó½«²»´¦Àí£¬ÀÛ¼ÆÆğÀ´µÈ²»×èÈûÊ±ÔÙ´¦Àí
+//zw è®¾ç½®å®¢æˆ·ç«¯é˜»å¡ï¼Œæ­¤æ—¶è¯·æ±‚å°†ä¸å¤„ç†ï¼Œç´¯è®¡èµ·æ¥ç­‰ä¸é˜»å¡æ—¶å†å¤„ç†
 void blockClient(redisClient *c, int btype) {
     c->flags |= REDIS_BLOCKED;
     c->btype = btype;
@@ -108,7 +108,7 @@ void blockClient(redisClient *c, int btype) {
 /* This function is called in the beforeSleep() function of the event loop
  * in order to process the pending input buffer of clients that were
  * unblocked after a blocking operation. */
-//zw ´¦Àí·Ç×èÈûµÄ¿Í»§¶Ë£¬Õâ¸öº¯ÊıÔÚ event loop µÄ beforeSleepº¯ÊıÖĞ´¦Àí
+//zw å¤„ç†éé˜»å¡çš„å®¢æˆ·ç«¯ï¼Œè¿™ä¸ªå‡½æ•°åœ¨ event loop çš„ beforeSleepå‡½æ•°ä¸­å¤„ç†
 void processUnblockedClients(void) {
     listNode *ln;
     redisClient *c;
@@ -131,7 +131,7 @@ void processUnblockedClients(void) {
 
 /* Unblock a client calling the right function depending on the kind
  * of operation the client is blocking for. */
-//zw ÉèÖÃ¿Í»§¶Ë·Ç×èÈû
+//zw è®¾ç½®å®¢æˆ·ç«¯éé˜»å¡
 void unblockClient(redisClient *c) {
     if (c->btype == REDIS_BLOCKED_LIST) {
         unblockClientWaitingData(c);
@@ -151,7 +151,7 @@ void unblockClient(redisClient *c) {
 
 /* This function gets called when a blocked client timed out in order to
  * send it a reply of some kind. */
-//zw µ±×èÈû¿Í»§¶Ë³¬Ê±µÄÊ±ºò£¬·¢ËÍ¸ø¿Í»§¶Ë
+//zw å½“é˜»å¡å®¢æˆ·ç«¯è¶…æ—¶çš„æ—¶å€™ï¼Œå‘é€ç»™å®¢æˆ·ç«¯
 void replyToBlockedClientTimedOut(redisClient *c) {
     if (c->btype == REDIS_BLOCKED_LIST) {
         addReply(c,shared.nullmultibulk);
@@ -169,8 +169,8 @@ void replyToBlockedClientTimedOut(redisClient *c) {
  *
  * The semantics is to send an -UNBLOCKED error to the client, disconnecting
  * it at the same time. */
-//zw µ±·Ç×èÈû¿Í»§¶ËÒ»Ğ©¶«Î÷¸Ä±äµÄÊ±ºò£¬»áµ¼ÖÂ×èÈû²»ÔÙ°²È«£¬
-//zw ±ÈÈçÔÚ×èÈûÁ¬Á´±íÀïÃæµÄ¿Í»§¶Ë´Ómaster×ªÎªslave,ÕâÊ±ºòÕâº¯Êı¾Í»áµ÷ÓÃ
+//zw å½“éé˜»å¡å®¢æˆ·ç«¯ä¸€äº›ä¸œè¥¿æ”¹å˜çš„æ—¶å€™ï¼Œä¼šå¯¼è‡´é˜»å¡ä¸å†å®‰å…¨ï¼Œ
+//zw æ¯”å¦‚åœ¨é˜»å¡è¿é“¾è¡¨é‡Œé¢çš„å®¢æˆ·ç«¯ä»masterè½¬ä¸ºslave,è¿™æ—¶å€™è¿™å‡½æ•°å°±ä¼šè°ƒç”¨
 void disconnectAllBlockedClients(void) {
     listNode *ln;
     listIter li;

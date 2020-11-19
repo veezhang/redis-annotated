@@ -38,7 +38,7 @@
  * by the user before to call AlFreeList().
  *
  * On error, NULL is returned. Otherwise the pointer to the new list. */
-//zw 创建链表
+//zw 鍒涘缓閾捐〃
 list *listCreate(void)
 {
     struct list *list;
@@ -56,7 +56,7 @@ list *listCreate(void)
 /* Free the whole list.
  *
  * This function can't fail. */
-//zw 释放链表
+//zw 閲婃斁閾捐〃
 void listRelease(list *list)
 {
     unsigned long len;

@@ -350,12 +350,12 @@ typedef long long mstime_t; /* millisecond time type. */
 #define REDIS_OP_INTER 2
 
 /* Redis maxmemory strategies */
-#define REDIS_MAXMEMORY_VOLATILE_LRU 0              //zw Ê¹ÓÃLRUËã·¨£¬´ÓÉèÖÃÁË¹ıÆÚÊ±¼äµÄkeyÖĞÑ¡ÔñÉ¾³ı
-#define REDIS_MAXMEMORY_VOLATILE_TTL 1              //zw Ê¹ÓÃLRUËã·¨£¬´ÓËùÓĞkeyÖĞÑ¡ÔñÉ¾³ı
-#define REDIS_MAXMEMORY_VOLATILE_RANDOM 2           //zw ´ÓÉèÖÃÁË¹ıÆÚÊ±¼äµÄkeyÖĞËæ»úÉ¾³ı
-#define REDIS_MAXMEMORY_ALLKEYS_LRU 3               //zw ´ÓËùÓĞµÄkeyÖĞËæ»úÉ¾³ı
-#define REDIS_MAXMEMORY_ALLKEYS_RANDOM 4            //zw ´ÓÉèÖÃÁË¹ıÆÚÊ±¼äµÄkeyÖĞÑ¡Ôñ×îÏÈ¹ıÆÚµÄÉ¾³ı
-#define REDIS_MAXMEMORY_NO_EVICTION 5               //zw ²»´¦Àí£¬µ±ÓĞĞ´²Ù×÷Ê±£¬Ö±½Ó·µ»Ø´íÎó(Ä¬ÈÏ)
+#define REDIS_MAXMEMORY_VOLATILE_LRU 0              //zw ä½¿ç”¨LRUç®—æ³•ï¼Œä»è®¾ç½®äº†è¿‡æœŸæ—¶é—´çš„keyä¸­é€‰æ‹©åˆ é™¤
+#define REDIS_MAXMEMORY_VOLATILE_TTL 1              //zw ä½¿ç”¨LRUç®—æ³•ï¼Œä»æ‰€æœ‰keyä¸­é€‰æ‹©åˆ é™¤
+#define REDIS_MAXMEMORY_VOLATILE_RANDOM 2           //zw ä»è®¾ç½®äº†è¿‡æœŸæ—¶é—´çš„keyä¸­éšæœºåˆ é™¤
+#define REDIS_MAXMEMORY_ALLKEYS_LRU 3               //zw ä»æ‰€æœ‰çš„keyä¸­éšæœºåˆ é™¤
+#define REDIS_MAXMEMORY_ALLKEYS_RANDOM 4            //zw ä»è®¾ç½®äº†è¿‡æœŸæ—¶é—´çš„keyä¸­é€‰æ‹©æœ€å…ˆè¿‡æœŸçš„åˆ é™¤
+#define REDIS_MAXMEMORY_NO_EVICTION 5               //zw ä¸å¤„ç†ï¼Œå½“æœ‰å†™æ“ä½œæ—¶ï¼Œç›´æ¥è¿”å›é”™è¯¯(é»˜è®¤)
 #define REDIS_DEFAULT_MAXMEMORY_POLICY REDIS_MAXMEMORY_NO_EVICTION
 
 /* Scripting */
@@ -425,11 +425,11 @@ typedef long long mstime_t; /* millisecond time type. */
 #define REDIS_LRU_CLOCK_MAX ((1<<REDIS_LRU_BITS)-1) /* Max value of obj->lru */
 #define REDIS_LRU_CLOCK_RESOLUTION 1000 /* LRU clock resolution in ms */
 typedef struct redisObject {
-    unsigned type:4;            //zw ¶ÔÏóµÄÀàĞÍ£¬×Ö·û´®/ÁĞ±í/¼¯ºÏ/¹şÏ£±í
-    unsigned encoding:4;        //zw ±àÂëµÄ·½Ê½£¬Redis ÎªÁË½ÚÊ¡¿Õ¼ä£¬Ìá¹©¶àÖÖ·½Ê½À´±£´æÒ»¸öÊı¾İ
-    unsigned lru:REDIS_LRU_BITS; /* lru time (relative to server.lruclock) µ±ÄÚ´æ½ôÕÅ£¬ÌÔÌ­Êı¾İµÄÊ±ºòÓÃµ½ */
-    int refcount;               //zw ÒıÓÃ¼ÆÊı
-    void *ptr;                  //zw Êı¾İ¶ÔÏó
+    unsigned type:4;            //zw å¯¹è±¡çš„ç±»å‹ï¼Œå­—ç¬¦ä¸²/åˆ—è¡¨/é›†åˆ/å“ˆå¸Œè¡¨
+    unsigned encoding:4;        //zw ç¼–ç çš„æ–¹å¼ï¼ŒRedis ä¸ºäº†èŠ‚çœç©ºé—´ï¼Œæä¾›å¤šç§æ–¹å¼æ¥ä¿å­˜ä¸€ä¸ªæ•°æ®
+    unsigned lru:REDIS_LRU_BITS; /* lru time (relative to server.lruclock) å½“å†…å­˜ç´§å¼ ï¼Œæ·˜æ±°æ•°æ®çš„æ—¶å€™ç”¨åˆ° */
+    int refcount;               //zw å¼•ç”¨è®¡æ•°
+    void *ptr;                  //zw æ•°æ®å¯¹è±¡
 } robj;
 
 /* Macro used to obtain the current LRU clock.

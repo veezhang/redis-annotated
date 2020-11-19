@@ -45,11 +45,11 @@
 /* Create a new slowlog entry.
  * Incrementing the ref count of all the objects retained is up to
  * this function. */
-//zw ´´½¨Ò»¸öslowlogÊµÌå
+//zw åˆ›å»ºä¸€ä¸ªslowlogå®ä½“
 slowlogEntry *slowlogCreateEntry(robj **argv, int argc, long long duration) {
     slowlogEntry *se = zmalloc(sizeof(*se));
     int j, slargc = argc;
-    //zw ×î¶à±£´æSLOWLOG_ENTRY_MAX_ARGC¸ö²ÎÊı£¬Èç¹û¶àÓà£¬ÄÇÃ´±£´æSLOWLOG_ENTRY_MAX_ARGC-1¸ö²ÎÊı£¬×îºóÒ»¸ö±£´æ»¹ÓĞ¼¸¸ö²ÎÊı
+    //zw æœ€å¤šä¿å­˜SLOWLOG_ENTRY_MAX_ARGCä¸ªå‚æ•°ï¼Œå¦‚æœå¤šä½™ï¼Œé‚£ä¹ˆä¿å­˜SLOWLOG_ENTRY_MAX_ARGC-1ä¸ªå‚æ•°ï¼Œæœ€åä¸€ä¸ªä¿å­˜è¿˜æœ‰å‡ ä¸ªå‚æ•°
     if (slargc > SLOWLOG_ENTRY_MAX_ARGC) slargc = SLOWLOG_ENTRY_MAX_ARGC;
     se->argc = slargc;
     se->argv = zmalloc(sizeof(robj*)*slargc);
@@ -65,7 +65,7 @@ slowlogEntry *slowlogCreateEntry(robj **argv, int argc, long long duration) {
             /* Trim too long strings as well... */
             if (argv[j]->type == REDIS_STRING &&
                 sdsEncodedObject(argv[j]) &&
-                sdslen(argv[j]->ptr) > SLOWLOG_ENTRY_MAX_STRING)//zw ×Ö·û´®¹ı³¤£¬¾Í½ØÈ¡
+                sdslen(argv[j]->ptr) > SLOWLOG_ENTRY_MAX_STRING)//zw å­—ç¬¦ä¸²è¿‡é•¿ï¼Œå°±æˆªå–
             {
                 sds s = sdsnewlen(argv[j]->ptr, SLOWLOG_ENTRY_MAX_STRING);
 
@@ -81,7 +81,7 @@ slowlogEntry *slowlogCreateEntry(robj **argv, int argc, long long duration) {
     }
     se->time = time(NULL);
     se->duration = duration;
-    se->id = server.slowlog_entry_id++; //zw È«¾ÖÎ¨Ò»±êÊ¶id
+    se->id = server.slowlog_entry_id++; //zw å…¨å±€å”¯ä¸€æ ‡è¯†id
     return se;
 }
 
@@ -89,7 +89,7 @@ slowlogEntry *slowlogCreateEntry(robj **argv, int argc, long long duration) {
  * function matches the one of the 'free' method of adlist.c.
  *
  * This function will take care to release all the retained object. */
-//zw ÊÍ·Å slowlogÊµÌå
+//zw é‡Šæ”¾ slowlogå®ä½“
 void slowlogFreeEntry(void *septr) {
     slowlogEntry *se = septr;
     int j;
@@ -102,31 +102,31 @@ void slowlogFreeEntry(void *septr) {
 
 /* Initialize the slow log. This function should be called a single time
  * at server startup. */
-//zw slowlog³õÊ¼»¯
+//zw slowlogåˆå§‹åŒ–
 void slowlogInit(void) {
     server.slowlog = listCreate();
     server.slowlog_entry_id = 0;
-    listSetFreeMethod(server.slowlog,slowlogFreeEntry); //zw ÉèÖÃÊÍ·Åº¯Êı
+    listSetFreeMethod(server.slowlog,slowlogFreeEntry); //zw è®¾ç½®é‡Šæ”¾å‡½æ•°
 }
 
 /* Push a new entry into the slow log.
  * This function will make sure to trim the slow log accordingly to the
  * configured max length. */
-//zw Ìí¼Óslowlog£¬¸ù¾İÅäÖÃµÄ×î´ó³¤¶ÈÉ¾³ı¾ÉµÄÂıÈÕÖ¾ÊµÌå
+//zw æ·»åŠ slowlogï¼Œæ ¹æ®é…ç½®çš„æœ€å¤§é•¿åº¦åˆ é™¤æ—§çš„æ…¢æ—¥å¿—å®ä½“
 void slowlogPushEntryIfNeeded(robj **argv, int argc, long long duration) {
-    if (server.slowlog_log_slower_than < 0) return; /* Slowlog disabled Ã»Æô¶¯ÂıÈÕÖ¾*/
-    //zw Èç¹ûÊ±¼ä´óÓÚÅäÖÃµÄÊ±¼ä£¬ÄÇÃ´½«ÆäÌí¼Óµ½server.slowlog
+    if (server.slowlog_log_slower_than < 0) return; /* Slowlog disabled æ²¡å¯åŠ¨æ…¢æ—¥å¿—*/
+    //zw å¦‚æœæ—¶é—´å¤§äºé…ç½®çš„æ—¶é—´ï¼Œé‚£ä¹ˆå°†å…¶æ·»åŠ åˆ°server.slowlog
     if (duration >= server.slowlog_log_slower_than)
         listAddNodeHead(server.slowlog,slowlogCreateEntry(argv,argc,duration));
 
     /* Remove old entries if needed. */
-    //zw ¸ù¾İÅäÖÃµÄ×î´ó³¤¶ÈÉ¾³ı¾ÉµÄÂıÈÕÖ¾ÊµÌå
+    //zw æ ¹æ®é…ç½®çš„æœ€å¤§é•¿åº¦åˆ é™¤æ—§çš„æ…¢æ—¥å¿—å®ä½“
     while (listLength(server.slowlog) > server.slowlog_max_len)
         listDelNode(server.slowlog,listLast(server.slowlog));
 }
 
 /* Remove all the entries from the current slow log. */
-//zw ÖØÉèÂıÈÕÖ¾£¬Çå³şµ±Ç°ËùÓĞµÄ
+//zw é‡è®¾æ…¢æ—¥å¿—ï¼Œæ¸…æ¥šå½“å‰æ‰€æœ‰çš„
 void slowlogReset(void) {
     while (listLength(server.slowlog) > 0)
         listDelNode(server.slowlog,listLast(server.slowlog));
@@ -134,17 +134,17 @@ void slowlogReset(void) {
 
 /* The SLOWLOG command. Implements all the subcommands needed to handle the
  * Redis slow log. */
-//zw ÂıÈÕÖ¾ÃüÁî
+//zw æ…¢æ—¥å¿—å‘½ä»¤
 void slowlogCommand(redisClient *c) {
-    if (c->argc == 2 && !strcasecmp(c->argv[1]->ptr,"reset")) {         //zw ÖØÉè
+    if (c->argc == 2 && !strcasecmp(c->argv[1]->ptr,"reset")) {         //zw é‡è®¾
         slowlogReset();
         addReply(c,shared.ok);
-    } else if (c->argc == 2 && !strcasecmp(c->argv[1]->ptr,"len")) {    //zw µ±Ç°ÂıÈÕÖ¾³¤¶È
+    } else if (c->argc == 2 && !strcasecmp(c->argv[1]->ptr,"len")) {    //zw å½“å‰æ…¢æ—¥å¿—é•¿åº¦
         addReplyLongLong(c,listLength(server.slowlog));
     } else if ((c->argc == 2 || c->argc == 3) &&
-               !strcasecmp(c->argv[1]->ptr,"get"))                      //zw »ñÈ¡ÂıÈÕÖ¾
+               !strcasecmp(c->argv[1]->ptr,"get"))                      //zw è·å–æ…¢æ—¥å¿—
     {
-        long count = 10, sent = 0;  //zw Ä¬ÈÏ10¸ö£¬Èç¹ûÓĞµÚÈı¸ö²ÎÊı£¬µÚÈı¸ö²ÎÊıÎªÊıÄ¿
+        long count = 10, sent = 0;  //zw é»˜è®¤10ä¸ªï¼Œå¦‚æœæœ‰ç¬¬ä¸‰ä¸ªå‚æ•°ï¼Œç¬¬ä¸‰ä¸ªå‚æ•°ä¸ºæ•°ç›®
         listIter li;
         void *totentries;
         listNode *ln;

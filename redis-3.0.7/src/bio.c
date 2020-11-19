@@ -1,5 +1,5 @@
 /* Background I/O service for Redis.
- *zw Õâ¸öÎÄ¼şÊÇredisºóÌ¨IO·şÎñµÄÊµÏÖ
+ *zw è¿™ä¸ªæ–‡ä»¶æ˜¯redisåå°IOæœåŠ¡çš„å®ç°
  *
  * This file implements operations that we need to perform in the background.
  * Currently there is only a single operation, that is a background close(2)
@@ -7,8 +7,8 @@
  * reference to a file closing it means unlinking it, and the deletion of the
  * file is slow, blocking the server.
  *
- *zw Õâ¸öÎÄ¼ş¸ºÔğÎÒÃÇĞèÒªÔÚºóÌ¨Ö´ĞĞµÄ²Ù×÷¡£ÏÖÔÚredisµÄ°æ±¾ÖĞÖ»ÓĞÒ»ÀàµÄ²Ù×÷£¬ºóÌ¨µÄclose ÏµÍ³µ÷ÓÃ¡£
- *ÎªÁË±ÜÃâÒ»¸öÎÄ¼ş×îºóµÄownerÔÚÖ´ĞĞclose²Ù×÷´øÀ´µÄunlinkÊ¹µÃ×èÈûserver£¬½«ÕâÀà²Ù×÷ÓÃµ¥¶ÀµÄºóÌ¨Ïß³ÌÀ´Ö´ĞĞ
+ *zw è¿™ä¸ªæ–‡ä»¶è´Ÿè´£æˆ‘ä»¬éœ€è¦åœ¨åå°æ‰§è¡Œçš„æ“ä½œã€‚ç°åœ¨redisçš„ç‰ˆæœ¬ä¸­åªæœ‰ä¸€ç±»çš„æ“ä½œï¼Œåå°çš„close ç³»ç»Ÿè°ƒç”¨ã€‚
+ *ä¸ºäº†é¿å…ä¸€ä¸ªæ–‡ä»¶æœ€åçš„owneråœ¨æ‰§è¡Œcloseæ“ä½œå¸¦æ¥çš„unlinkä½¿å¾—é˜»å¡serverï¼Œå°†è¿™ç±»æ“ä½œç”¨å•ç‹¬çš„åå°çº¿ç¨‹æ¥æ‰§è¡Œ
  * 
  * In the future we'll either continue implementing new things we need or
  * we'll switch to libeio. However there are probably long term uses for this
@@ -23,7 +23,7 @@
  * and a different thread and job queue for every job type.
  * Every thread wait for new jobs in its queue, and process every job
  * sequentially.
- *zw Ã¿ÖÖ×÷ÒµÀàĞÍÒ»¸öqueue¡£Ã¿¸öÏß³ÌÔÚËüµÄqueueÀïµÈ´ıĞÂµÄjobµ½À´¡£²¢ÇÒ°´ÕÕFIFOµÄË³Ğò´¦Àí×÷Òµ¡£
+ *zw æ¯ç§ä½œä¸šç±»å‹ä¸€ä¸ªqueueã€‚æ¯ä¸ªçº¿ç¨‹åœ¨å®ƒçš„queueé‡Œç­‰å¾…æ–°çš„jobåˆ°æ¥ã€‚å¹¶ä¸”æŒ‰ç…§FIFOçš„é¡ºåºå¤„ç†ä½œä¸šã€‚
  *
  * Jobs of the same type are guaranteed to be processed from the least
  * recently inserted to the most recently inserted (older jobs processed
@@ -31,7 +31,7 @@
  *
  * Currently there is no way for the creator of the job to be notified about
  * the completion of the operation, this will only be added when/if needed.
- *zw ×÷ÒµÍê³Éºó£¬ÆäcreatorÎŞ·¨µÃµ½Í¨Öª¡£
+ *zw ä½œä¸šå®Œæˆåï¼Œå…¶creatoræ— æ³•å¾—åˆ°é€šçŸ¥ã€‚
  * ----------------------------------------------------------------------------
  *
  * Copyright (c) 2009-2012, Salvatore Sanfilippo <antirez at gmail dot com>
@@ -66,11 +66,11 @@
 #include "redis.h"
 #include "bio.h"
 
-//zw Ê¹ÓÃ»¥³âÁ¿+Ìõ¼ş±äÁ¿£¬×÷ÎªÏß³ÌµÄ±£»¤Ìõ¼ş£¬Ò»ÖÖ×÷ÒµÀàĞÍÒ»¸öÏß³Ì´¦Àí
+//zw ä½¿ç”¨äº’æ–¥é‡+æ¡ä»¶å˜é‡ï¼Œä½œä¸ºçº¿ç¨‹çš„ä¿æŠ¤æ¡ä»¶ï¼Œä¸€ç§ä½œä¸šç±»å‹ä¸€ä¸ªçº¿ç¨‹å¤„ç†
 static pthread_t bio_threads[REDIS_BIO_NUM_OPS];
 static pthread_mutex_t bio_mutex[REDIS_BIO_NUM_OPS];
 static pthread_cond_t bio_condvar[REDIS_BIO_NUM_OPS];
-//zw ×÷ÒµµÄ¶ÓÁĞ Ö¸ÕëÊı×é£º±¾ÉíÊÇÊı×é£¬Êı×éÀïÃæ´æ·ÅµÄÖ¸Õë
+//zw ä½œä¸šçš„é˜Ÿåˆ— æŒ‡é’ˆæ•°ç»„ï¼šæœ¬èº«æ˜¯æ•°ç»„ï¼Œæ•°ç»„é‡Œé¢å­˜æ”¾çš„æŒ‡é’ˆ
 static list *bio_jobs[REDIS_BIO_NUM_OPS];
 /* The following array is used to hold the number of pending jobs for every
  * OP type. This allows us to export the bioPendingJobsOfType() API that is
@@ -78,12 +78,12 @@ static list *bio_jobs[REDIS_BIO_NUM_OPS];
  * objects shared with the background thread. The main thread will just wait
  * that there are no longer jobs of this type to be executed before performing
  * the sensible operation. This data is also useful for reporting. */
-//zw ×÷Òµ¹ÒÆğµÄÊıÄ¿
+//zw ä½œä¸šæŒ‚èµ·çš„æ•°ç›®
 static unsigned long long bio_pending[REDIS_BIO_NUM_OPS];
 
 /* This structure represents a background Job. It is only used locally to this
  * file as the API does not expose the internals at all. */
-//zw ºóÌ¨×÷Òµ
+//zw åå°ä½œä¸š
 struct bio_job {
     time_t time; /* Time at which the job was created. */
     /* Job specific arguments pointers. If we need to pass more than three
@@ -91,16 +91,16 @@ struct bio_job {
     void *arg1, *arg2, *arg3;
 };
 
-//zw ºóÌ¨×÷Òµ´¦Àíº¯Êı£¬ argÎª×÷ÒµÀàĞÍ
+//zw åå°ä½œä¸šå¤„ç†å‡½æ•°ï¼Œ argä¸ºä½œä¸šç±»å‹
 void *bioProcessBackgroundJobs(void *arg);
 
 /* Make sure we have enough stack to perform all the things we do in the
  * main thread. */
-//zw Õ»´óĞ¡ 4M
+//zw æ ˆå¤§å° 4M
 #define REDIS_THREAD_STACK_SIZE (1024*1024*4)
 
 /* Initialize the background system, spawning the thread. */
-//zw bio³õÊ¼»¯
+//zw bioåˆå§‹åŒ–
 void bioInit(void) {
     pthread_attr_t attr;
     pthread_t thread;
@@ -108,7 +108,7 @@ void bioInit(void) {
     int j;
 
     /* Initialization of state vars and objects */
-    //zw ³õÊ¼»¯×´Ì¬±äÁ¿
+    //zw åˆå§‹åŒ–çŠ¶æ€å˜é‡
     for (j = 0; j < REDIS_BIO_NUM_OPS; j++) {
         pthread_mutex_init(&bio_mutex[j],NULL);
         pthread_cond_init(&bio_condvar[j],NULL);
@@ -117,7 +117,7 @@ void bioInit(void) {
     }
 
     /* Set the stack size as by default it may be small in some system */
-    //zw ÉèÖÃÕ»£¨stack£©´óĞ¡
+    //zw è®¾ç½®æ ˆï¼ˆstackï¼‰å¤§å°
     pthread_attr_init(&attr);
     pthread_attr_getstacksize(&attr,&stacksize);
     if (!stacksize) stacksize = 1; /* The world is full of Solaris Fixes */
@@ -136,9 +136,9 @@ void bioInit(void) {
         }
         bio_threads[j] = thread;
     }
-//    pthread_attr_destroy(&attr); Ô´´úÂëÃ»ÓĞ
+//    pthread_attr_destroy(&attr); æºä»£ç æ²¡æœ‰
 }
-//zw ´´½¨ ºóÌ¨×÷Òµ
+//zw åˆ›å»º åå°ä½œä¸š
 void bioCreateBackgroundJob(int type, void *arg1, void *arg2, void *arg3) {
     struct bio_job *job = zmalloc(sizeof(*job));
 
@@ -160,22 +160,22 @@ void *bioProcessBackgroundJobs(void *arg) {
 
     /* Make the thread killable at any time, so that bioKillThreads()
      * can work reliably. */
-    //zw ÈÃÏÔÊ¾ÈÎºÎÊ±ºò¶¼ÄÜ¹»±»cancel
-    //zw ÉèÖÃ±¾Ïß³Ì¶ÔCancelĞÅºÅµÄ·´Ó¦£¬PTHREAD_CANCEL_ENABLE£¨È±Ê¡£©ºÍPTHREAD_CANCEL_DISABLE£¬
-    //zw ·Ö±ğ±íÊ¾ÊÕµ½ĞÅºÅºóÉèÎªCANCLED×´Ì¬ºÍºöÂÔCANCELĞÅºÅ¼ÌĞøÔËĞĞ
+    //zw è®©æ˜¾ç¤ºä»»ä½•æ—¶å€™éƒ½èƒ½å¤Ÿè¢«cancel
+    //zw è®¾ç½®æœ¬çº¿ç¨‹å¯¹Cancelä¿¡å·çš„ååº”ï¼ŒPTHREAD_CANCEL_ENABLEï¼ˆç¼ºçœï¼‰å’ŒPTHREAD_CANCEL_DISABLEï¼Œ
+    //zw åˆ†åˆ«è¡¨ç¤ºæ”¶åˆ°ä¿¡å·åè®¾ä¸ºCANCLEDçŠ¶æ€å’Œå¿½ç•¥CANCELä¿¡å·ç»§ç»­è¿è¡Œ
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-    //zw ÉèÖÃ±¾Ïß³ÌÈ¡Ïû¶¯×÷µÄÖ´ĞĞÊ±»ú£¬typeÓÉÁ½ÖÖÈ¡Öµ£ºPTHREAD_CANCEL_DEFFEREDºÍPTHREAD_CANCEL_ASYCHRONOUS
-    //zw ·Ö±ğ±íÊ¾ÊÕµ½ĞÅºÅºó¼ÌĞøÔËĞĞÖÁÏÂÒ»¸öÈ¡ÏûµãÔÙÍË³öºÍÁ¢¼´Ö´ĞĞÈ¡Ïû¶¯×÷£¨ÍË³ö£©
+    //zw è®¾ç½®æœ¬çº¿ç¨‹å–æ¶ˆåŠ¨ä½œçš„æ‰§è¡Œæ—¶æœºï¼Œtypeç”±ä¸¤ç§å–å€¼ï¼šPTHREAD_CANCEL_DEFFEREDå’ŒPTHREAD_CANCEL_ASYCHRONOUS
+    //zw åˆ†åˆ«è¡¨ç¤ºæ”¶åˆ°ä¿¡å·åç»§ç»­è¿è¡Œè‡³ä¸‹ä¸€ä¸ªå–æ¶ˆç‚¹å†é€€å‡ºå’Œç«‹å³æ‰§è¡Œå–æ¶ˆåŠ¨ä½œï¼ˆé€€å‡ºï¼‰
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
     pthread_mutex_lock(&bio_mutex[type]);
     /* Block SIGALRM so we are sure that only the main thread will
      * receive the watchdog signal. */
-    //zw http://xinzhiwen198941-163-com.iteye.com/blog/993618 Ïß³Ì
-    //zw ÈÃÖ÷Ïß³ÌÀ´´¦ÀíÕâĞ©ĞÅºÅ
+    //zw http://xinzhiwen198941-163-com.iteye.com/blog/993618 çº¿ç¨‹
+    //zw è®©ä¸»çº¿ç¨‹æ¥å¤„ç†è¿™äº›ä¿¡å·
     sigemptyset(&sigset);
     sigaddset(&sigset, SIGALRM);
-    if (pthread_sigmask(SIG_BLOCK, &sigset, NULL))//zw SIG_BLOCK:½á¹û¼¯ÊÇµ±Ç°¼¯ºÏ²ÎÊı¼¯µÄ²¢¼¯£»SIG_UNBLOCK:½á¹û¼¯ÊÇµ±Ç°¼¯ºÏ²ÎÊı¼¯µÄ²î¼¯£»SIG_SETMASK:½á¹û¼¯ÊÇÓÉ²ÎÊı¼¯Ö¸ÏòµÄ¼¯
+    if (pthread_sigmask(SIG_BLOCK, &sigset, NULL))//zw SIG_BLOCK:ç»“æœé›†æ˜¯å½“å‰é›†åˆå‚æ•°é›†çš„å¹¶é›†ï¼›SIG_UNBLOCK:ç»“æœé›†æ˜¯å½“å‰é›†åˆå‚æ•°é›†çš„å·®é›†ï¼›SIG_SETMASK:ç»“æœé›†æ˜¯ç”±å‚æ•°é›†æŒ‡å‘çš„é›†
         redisLog(REDIS_WARNING,
             "Warning: can't mask SIGALRM in bio.c thread: %s", strerror(errno));
 
@@ -195,7 +195,7 @@ void *bioProcessBackgroundJobs(void *arg) {
         pthread_mutex_unlock(&bio_mutex[type]);
 
         /* Process the job accordingly to its type. */
-        //zw ´¦Àí×÷Òµ
+        //zw å¤„ç†ä½œä¸š
         if (type == REDIS_BIO_CLOSE_FILE) {
             close((long)job->arg1);
         } else if (type == REDIS_BIO_AOF_FSYNC) {
@@ -214,7 +214,7 @@ void *bioProcessBackgroundJobs(void *arg) {
 }
 
 /* Return the number of pending jobs of the specified type. */
-//zw ·µ»ØÄ³ÀàĞÍ×÷ÒµÊıÄ¿
+//zw è¿”å›æŸç±»å‹ä½œä¸šæ•°ç›®
 unsigned long long bioPendingJobsOfType(int type) {
     unsigned long long val;
     pthread_mutex_lock(&bio_mutex[type]);
@@ -227,7 +227,7 @@ unsigned long long bioPendingJobsOfType(int type) {
  * used only when it's critical to stop the threads for some reason.
  * Currently Redis does this only on crash (for instance on SIGSEGV) in order
  * to perform a fast memory check without other threads messing with memory. */
-//zw É±ËÀÏß³Ì redisÖ»ÓĞcrashÊ±ºò²Å»áÓÃ SIGSEGV£¬ÒÔ±ã ¿ìËÙµÄÄÚ´æ¼ì´íÃ»ÓĞÏß³ÌÀ¬»ø
+//zw æ€æ­»çº¿ç¨‹ redisåªæœ‰crashæ—¶å€™æ‰ä¼šç”¨ SIGSEGVï¼Œä»¥ä¾¿ å¿«é€Ÿçš„å†…å­˜æ£€é”™æ²¡æœ‰çº¿ç¨‹åƒåœ¾
 void bioKillThreads(void) {
     int err, j;
 

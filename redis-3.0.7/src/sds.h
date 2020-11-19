@@ -36,57 +36,57 @@
 #include <sys/types.h>
 #include <stdarg.h>
 
-//zw Îªchar *ÀàĞÍ¶¨Òå±ğÃûÎªsds
+//zw ä¸ºchar *ç±»å‹å®šä¹‰åˆ«åä¸ºsds
 typedef char *sds;
 
-//zw ×Ö·û´®½á¹¹Ìå
+//zw å­—ç¬¦ä¸²ç»“æ„ä½“
 struct sdshdr {
-    //zw ×Ö·û´®µ±Ç°³¤¶È
+    //zw å­—ç¬¦ä¸²å½“å‰é•¿åº¦
     unsigned int len;
-    //zw Ê£Óà¿ÉÓÃ³¤¶È
+    //zw å‰©ä½™å¯ç”¨é•¿åº¦
     unsigned int free;
-    //zw ×Ö·ûÊı×é
+    //zw å­—ç¬¦æ•°ç»„
     char buf[];
 };
 
-//zw »ñÈ¡×Ö·û´®³¤¶È
+//zw è·å–å­—ç¬¦ä¸²é•¿åº¦
 static inline size_t sdslen(const sds s) {
-    //zw ÓÃs-(sizeof(struct sdshdr))¾ÍµÃµ½sdshdr *Ö¸Õë
+    //zw ç”¨s-(sizeof(struct sdshdr))å°±å¾—åˆ°sdshdr *æŒ‡é’ˆ
     struct sdshdr *sh = (void*)(s-(sizeof(struct sdshdr)));
     return sh->len;
 }
 
-//zw »ñÈ¡×Ö·ûÊı×éÖĞµÄ¿ÉÓÃ¿Õ¼ä
+//zw è·å–å­—ç¬¦æ•°ç»„ä¸­çš„å¯ç”¨ç©ºé—´
 static inline size_t sdsavail(const sds s) {
     struct sdshdr *sh = (void*)(s-(sizeof(struct sdshdr)));
     return sh->free;
 }
 
-//zw ¸ù¾İ¸ø³õÊ¼»¯²ÎÊıinitºÍ¸ø¶¨³¤¶È´´½¨ĞÂµÄ×Ö·û´®
+//zw æ ¹æ®ç»™åˆå§‹åŒ–å‚æ•°initå’Œç»™å®šé•¿åº¦åˆ›å»ºæ–°çš„å­—ç¬¦ä¸²
 sds sdsnewlen(const void *init, size_t initlen);
-//zw ¸ù¾İ¸ø¶¨µÄÖµ´´½¨sds
+//zw æ ¹æ®ç»™å®šçš„å€¼åˆ›å»ºsds
 sds sdsnew(const char *init);
-//zw ´´½¨Ò»¸ö¿Õ×Ö·û´®
+//zw åˆ›å»ºä¸€ä¸ªç©ºå­—ç¬¦ä¸²
 sds sdsempty(void);
-//zw »ñÈ¡sds³¤¶È
+//zw è·å–sdsé•¿åº¦
 size_t sdslen(const sds s);
-//zw ¸´ÖÆÒ»¸ösds
+//zw å¤åˆ¶ä¸€ä¸ªsds
 sds sdsdup(const sds s);
-//zw ÊÍ·ÅsdsµÄÄÚ´æ¿Õ¼ä
+//zw é‡Šæ”¾sdsçš„å†…å­˜ç©ºé—´
 void sdsfree(sds s);
-//zw »ñÈ¡sdsµÄ¿ÉÓÃ¿Õ¼ä
+//zw è·å–sdsçš„å¯ç”¨ç©ºé—´
 size_t sdsavail(const sds s);
-//zw À©Õ¹×Ö·û´®µ½Ö¸¶¨µÄ³¤¶È
+//zw æ‰©å±•å­—ç¬¦ä¸²åˆ°æŒ‡å®šçš„é•¿åº¦
 sds sdsgrowzero(sds s, size_t len);
-//zw ×Ö·û´®Á¬½Ó²Ù×÷
+//zw å­—ç¬¦ä¸²è¿æ¥æ“ä½œ
 sds sdscatlen(sds s, const void *t, size_t len);
 sds sdscat(sds s, const char *t);
 sds sdscatsds(sds s, const sds t);
-//zw ×Ö·û´®¸´ÖÆ²Ù×÷
+//zw å­—ç¬¦ä¸²å¤åˆ¶æ“ä½œ
 sds sdscpylen(sds s, const char *t, size_t len);
 sds sdscpy(sds s, const char *t);
 
-//zw ×Ö·û´®×·¼Ó ¸ñÊ½»¯µÄ×Ö·û´®
+//zw å­—ç¬¦ä¸²è¿½åŠ  æ ¼å¼åŒ–çš„å­—ç¬¦ä¸²
 sds sdscatvprintf(sds s, const char *fmt, va_list ap);
 #ifdef __GNUC__
 sds sdscatprintf(sds s, const char *fmt, ...)
@@ -94,45 +94,45 @@ sds sdscatprintf(sds s, const char *fmt, ...)
 #else
 sds sdscatprintf(sds s, const char *fmt, ...);
 #endif
-//zw ÀàËÆÓÚsdscatvprintf£¬ µ«±ÈÆä¿ì
+//zw ç±»ä¼¼äºsdscatvprintfï¼Œ ä½†æ¯”å…¶å¿«
 sds sdscatfmt(sds s, char const *fmt, ...);
-//zw ×Ö·û´®µÄtrim²Ù×÷£¬¸ß¼¶ÓïÑÔÆÕ±éÌá¹©£¬È¥µôÇ°ºóµÄcsetÖĞ×Ö·û
+//zw å­—ç¬¦ä¸²çš„trimæ“ä½œï¼Œé«˜çº§è¯­è¨€æ™®éæä¾›ï¼Œå»æ‰å‰åçš„csetä¸­å­—ç¬¦
 sds sdstrim(sds s, const char *cset);
-//zw ×Ö·û´®½ØÈ¡
+//zw å­—ç¬¦ä¸²æˆªå–
 void sdsrange(sds s, int start, int end);
-//zw ¸üĞÂ×Ö·û´®µÄ³¤¶È
+//zw æ›´æ–°å­—ç¬¦ä¸²çš„é•¿åº¦
 void sdsupdatelen(sds s);
-//zw Çå¿Õ×Ö·û´®
+//zw æ¸…ç©ºå­—ç¬¦ä¸²
 void sdsclear(sds s);
-//zw ×Ö·û´®±È½Ï²Ù×÷
+//zw å­—ç¬¦ä¸²æ¯”è¾ƒæ“ä½œ
 int sdscmp(const sds s1, const sds s2);
-//zw ×Ö·û´®·Ö¸î²Ù×÷
+//zw å­—ç¬¦ä¸²åˆ†å‰²æ“ä½œ
 sds *sdssplitlen(const char *s, int len, const char *sep, int seplen, int *count);
-//zw ÊÍ·Åsdssplitlenº¯Êı·µ»ØµÄsdsÊı×é
+//zw é‡Šæ”¾sdssplitlenå‡½æ•°è¿”å›çš„sdsæ•°ç»„
 void sdsfreesplitres(sds *tokens, int count);
-//zw ×ªĞ¡Ğ´
+//zw è½¬å°å†™
 void sdstolower(sds s);
-//zw ×ª´óĞ´
+//zw è½¬å¤§å†™
 void sdstoupper(sds s);
-//zw ½«Ò»¸ölong longÀàĞÍµÄÊı×Ö×ª»»Îª×Ö·û´®
+//zw å°†ä¸€ä¸ªlong longç±»å‹çš„æ•°å­—è½¬æ¢ä¸ºå­—ç¬¦ä¸²
 sds sdsfromlonglong(long long value);
-//zw °Ñ×Ö·û´®×ªÎªÒıºÅ°üº¬µÄ×Ö·û´®£¬×ªÒå×Ö·û»¹Ô­£¨¿É¼û£©£¬·Ç´òÓ¡×Ö·û×ª16½øÖÆ
+//zw æŠŠå­—ç¬¦ä¸²è½¬ä¸ºå¼•å·åŒ…å«çš„å­—ç¬¦ä¸²ï¼Œè½¬ä¹‰å­—ç¬¦è¿˜åŸï¼ˆå¯è§ï¼‰ï¼Œéæ‰“å°å­—ç¬¦è½¬16è¿›åˆ¶
 sds sdscatrepr(sds s, const char *p, size_t len);
-//zw ²ÎÊı½âÎö
+//zw å‚æ•°è§£æ
 sds *sdssplitargs(const char *line, int *argc);
-//zw ×Ö·ûÌæ»»²Ù×÷
+//zw å­—ç¬¦æ›¿æ¢æ“ä½œ
 sds sdsmapchars(sds s, const char *from, const char *to, size_t setlen);
-//zw ½«Ò»¸öC·ç¸ñµÄ×Ö·û´®Êı×éÓÃÖ¸¶¨·Ö¸ô·ûÁ¬½Ó³ÉÒ»¸ö×Ö·û´®
+//zw å°†ä¸€ä¸ªCé£æ ¼çš„å­—ç¬¦ä¸²æ•°ç»„ç”¨æŒ‡å®šåˆ†éš”ç¬¦è¿æ¥æˆä¸€ä¸ªå­—ç¬¦ä¸²
 sds sdsjoin(char **argv, int argc, char *sep);
 
 /* Low level functions exposed to the user API */
-//zw  È·±£sdsÖĞµÄ¿ÉÓÃ¿Õ¼ä´óÓÚ»òµÈÓÚaddlen£¬Èç¹ûµ±Ç°×Ö·û´®¿ÉÓÃ¿Õ¼ä²»Âú×ãÔòÖØĞÂÅäÖÃ¿Õ¼ä
+//zw  ç¡®ä¿sdsä¸­çš„å¯ç”¨ç©ºé—´å¤§äºæˆ–ç­‰äºaddlenï¼Œå¦‚æœå½“å‰å­—ç¬¦ä¸²å¯ç”¨ç©ºé—´ä¸æ»¡è¶³åˆ™é‡æ–°é…ç½®ç©ºé—´
 sds sdsMakeRoomFor(sds s, size_t addlen);
-//zw ¸ù¾İ¸ø¶¨²ÎÊıincrµ÷Õûµ±Ç°³¤¶ÈºÍ¿ÉÓÃ¿Õ¼ä´óĞ¡
+//zw æ ¹æ®ç»™å®šå‚æ•°incrè°ƒæ•´å½“å‰é•¿åº¦å’Œå¯ç”¨ç©ºé—´å¤§å°
 void sdsIncrLen(sds s, int incr);
-//zw ÊÍ·Å×Ö·ûÊı×ébufÖĞµÄ¶àÓà¿Õ¼ä£¬Ê¹Æä¸ÕºÃÄÜ´æ·Åµ±Ç°×Ö·ûÊı
+//zw é‡Šæ”¾å­—ç¬¦æ•°ç»„bufä¸­çš„å¤šä½™ç©ºé—´ï¼Œä½¿å…¶åˆšå¥½èƒ½å­˜æ”¾å½“å‰å­—ç¬¦æ•°
 sds sdsRemoveFreeSpace(sds s);
-//zw »ñÈ¡sdsÊµ¼Ê·ÖÅäµÄ¿Õ¼ä´óĞ¡£¨°üÀ¨×îºóµÄ'\0'½áÊø·û£©
+//zw è·å–sdså®é™…åˆ†é…çš„ç©ºé—´å¤§å°ï¼ˆåŒ…æ‹¬æœ€åçš„'\0'ç»“æŸç¬¦ï¼‰
 size_t sdsAllocSize(sds s);
 
 #endif

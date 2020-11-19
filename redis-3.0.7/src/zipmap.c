@@ -47,8 +47,8 @@
  * <zmlen> is 1 byte length that holds the current size of the zipmap.
  * When the zipmap length is greater than or equal to 254, this value
  * is not used and the zipmap needs to be traversed to find out the length.
- * zw zmlenÊÇ1×Ö½Ú³¤¶È,³ÖÓĞµÄµ±Ç°zipmapµÄ´óĞ¡¡£µ±zipmap³¤¶È´óÓÚ»òµÈÓÚ254,Õâ¸öÖµ²¢²»Ê¹ÓÃ£¬zipmapĞèÒª±éÀúÕÒ³ö³¤¶È ¡£
- * ÓÉÓÚ1¸ö×Ö½Ú£¬ ²úÉúÆ¿¾±£¬ºóÀ´±»ÆúÓÃ£¬ÓÃziplist´úÌæ
+ * zw zmlenæ˜¯1å­—èŠ‚é•¿åº¦,æŒæœ‰çš„å½“å‰zipmapçš„å¤§å°ã€‚å½“zipmapé•¿åº¦å¤§äºæˆ–ç­‰äº254,è¿™ä¸ªå€¼å¹¶ä¸ä½¿ç”¨ï¼Œzipmapéœ€è¦éå†æ‰¾å‡ºé•¿åº¦ ã€‚
+ * ç”±äº1ä¸ªå­—èŠ‚ï¼Œ äº§ç”Ÿç“¶é¢ˆï¼Œåæ¥è¢«å¼ƒç”¨ï¼Œç”¨ziplistä»£æ›¿
  *
  * <len> is the length of the following string (key or value).
  * <len> lengths are encoded in a single value or in a 5 bytes value.
@@ -56,18 +56,18 @@
  * 253, it's a single-byte length. If it is 254 then a four bytes unsigned
  * integer follows (in the host byte ordering). A value of 255 is used to
  * signal the end of the hash.
- * zw <len>ÊÇÏÂÁĞ×Ö·û´®µÄ³¤¶È(¼ü»òÖµ)
- * <len>³¤¶È±àÂëÔÚÒ»¸öµ¥Ò»µÄÖµ»òÔÚÒ»¸ö5×Ö½ÚÖµ¡£Èç¹ûµÚÒ»¸ö×Ö½ÚÖµ(×÷ÎªÒ»¸öunsigned 8Î»Öµ)ÊÇ½éÓÚ0ºÍ252,
- * ÕâÊÇÒ»¸öµ¥×Ö½Ú³¤¶È¡£Èç¹ûËüÊÇ253£¬½Ó×ÅºóÃæ»áÊÇÒ»¸öËÄ×Ö½ÚµÄÎŞ·ûºÅÕûÊı(ÔÚÖ÷»ú×Ö½ÚÅÅĞò)¡£Ò»¸öÖµ255ÓÃÓÚĞÅºÅ½áÊøµÄÉ¢ÁĞ¡£
+ * zw <len>æ˜¯ä¸‹åˆ—å­—ç¬¦ä¸²çš„é•¿åº¦(é”®æˆ–å€¼)
+ * <len>é•¿åº¦ç¼–ç åœ¨ä¸€ä¸ªå•ä¸€çš„å€¼æˆ–åœ¨ä¸€ä¸ª5å­—èŠ‚å€¼ã€‚å¦‚æœç¬¬ä¸€ä¸ªå­—èŠ‚å€¼(ä½œä¸ºä¸€ä¸ªunsigned 8ä½å€¼)æ˜¯ä»‹äº0å’Œ252,
+ * è¿™æ˜¯ä¸€ä¸ªå•å­—èŠ‚é•¿åº¦ã€‚å¦‚æœå®ƒæ˜¯253ï¼Œæ¥ç€åé¢ä¼šæ˜¯ä¸€ä¸ªå››å­—èŠ‚çš„æ— ç¬¦å·æ•´æ•°(åœ¨ä¸»æœºå­—èŠ‚æ’åº)ã€‚ä¸€ä¸ªå€¼255ç”¨äºä¿¡å·ç»“æŸçš„æ•£åˆ—ã€‚
  *
  * <free> is the number of free unused bytes after the string, resulting
  * from modification of values associated to a key. For instance if "foo"
  * is set to "bar", and later "foo" will be set to "hi", it will have a
  * free byte to use if the value will enlarge again later, or even in
  * order to add a key/value pair if it fits.
- * zw <free>ÊÇĞŞ¸Äkey¹ØÁªµÄvalueºóstringºóµÄÎ´Ê¹ÓÃµÄ¿ÕÏĞµÄ×Ö½ÚÊı¡£ÀıÈç,Èç¹û¡°foo¡± ÉèÖÃÎª¡°bar¡±,ºó¡°foo¡±½«±»ÉèÖÃÎª¡°hi¡±,
- * Ëü½«ÓĞÒ»¸öÃâ·ÑµÄ×Ö½Ú£¬Ê¹ÓÃÈç¹ûÖµ½«ÉÔºóÔÙÀ©´ó,ÉõÖÁÌí¼ÓÒ»¶ÔÊÊºÏµÄ¼ü/Öµ¡£
- * <free>×ÜÊÇÒ»¸öunsigned 8Î»,ÒòÎªÈç¹ûÔÚÒ»¸ö¸üĞÂ²Ù×÷ÓĞºÜ¶àÃâ·ÑµÄ×Ö½Ú,zipmap½«ÖØĞÂ·ÖÅä,ÒÔÈ·±£ËüÊÇ¾¡¿ÉÄÜĞ¡¡£
+ * zw <free>æ˜¯ä¿®æ”¹keyå…³è”çš„valueåstringåçš„æœªä½¿ç”¨çš„ç©ºé—²çš„å­—èŠ‚æ•°ã€‚ä¾‹å¦‚,å¦‚æœâ€œfooâ€ è®¾ç½®ä¸ºâ€œbarâ€,åâ€œfooâ€å°†è¢«è®¾ç½®ä¸ºâ€œhiâ€,
+ * å®ƒå°†æœ‰ä¸€ä¸ªå…è´¹çš„å­—èŠ‚ï¼Œä½¿ç”¨å¦‚æœå€¼å°†ç¨åå†æ‰©å¤§,ç”šè‡³æ·»åŠ ä¸€å¯¹é€‚åˆçš„é”®/å€¼ã€‚
+ * <free>æ€»æ˜¯ä¸€ä¸ªunsigned 8ä½,å› ä¸ºå¦‚æœåœ¨ä¸€ä¸ªæ›´æ–°æ“ä½œæœ‰å¾ˆå¤šå…è´¹çš„å­—èŠ‚,zipmapå°†é‡æ–°åˆ†é…,ä»¥ç¡®ä¿å®ƒæ˜¯å°½å¯èƒ½å°ã€‚
  *
  * <free> is always an unsigned 8 bit number, because if after an
  * update operation there are more than a few free bytes, the zipmap will be

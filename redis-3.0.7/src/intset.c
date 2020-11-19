@@ -42,7 +42,7 @@
 #define INTSET_ENC_INT64 (sizeof(int64_t))
 
 /* Return the required encoding for the provided value. */
-//zw ¸ù¾İÖµ¼ÆËãencodingËùĞè³¤¶È
+//zw æ ¹æ®å€¼è®¡ç®—encodingæ‰€éœ€é•¿åº¦
 static uint8_t _intsetValueEncoding(int64_t v) {
     if (v < INT32_MIN || v > INT32_MAX)
         return INTSET_ENC_INT64;
@@ -53,7 +53,7 @@ static uint8_t _intsetValueEncoding(int64_t v) {
 }
 
 /* Return the value at pos, given an encoding. */
-//zw ¸ù¾İposºÍencoding»ñÈ¡ÔªËØÖµ
+//zw æ ¹æ®poså’Œencodingè·å–å…ƒç´ å€¼
 static int64_t _intsetGetEncoded(intset *is, int pos, uint8_t enc) {
     int64_t v64;
     int32_t v32;
@@ -75,13 +75,13 @@ static int64_t _intsetGetEncoded(intset *is, int pos, uint8_t enc) {
 }
 
 /* Return the value at pos, using the configured encoding. */
-//zw ¸ù¾İpos»ñÈ¡ÔªËØÖµ£¬encodingÊÇintsetµÄ
+//zw æ ¹æ®posè·å–å…ƒç´ å€¼ï¼Œencodingæ˜¯intsetçš„
 static int64_t _intsetGet(intset *is, int pos) {
     return _intsetGetEncoded(is,pos,intrev32ifbe(is->encoding));
 }
 
 /* Set the value at pos, using the configured encoding. */
-//zw ¸ù¾İposÉèÖÃÔªËØÖµ
+//zw æ ¹æ®posè®¾ç½®å…ƒç´ å€¼
 static void _intsetSet(intset *is, int pos, int64_t value) {
     uint32_t encoding = intrev32ifbe(is->encoding);
 
@@ -98,7 +98,7 @@ static void _intsetSet(intset *is, int pos, int64_t value) {
 }
 
 /* Create an empty intset. */
-//zw ĞÂ½¨intset
+//zw æ–°å»ºintset
 intset *intsetNew(void) {
     intset *is = zmalloc(sizeof(intset));
     is->encoding = intrev32ifbe(INTSET_ENC_INT16);
@@ -107,7 +107,7 @@ intset *intsetNew(void) {
 }
 
 /* Resize the intset */
-//zw ÖØĞÂÉèÖÃ´óĞ¡
+//zw é‡æ–°è®¾ç½®å¤§å°
 static intset *intsetResize(intset *is, uint32_t len) {
     uint32_t size = len*intrev32ifbe(is->encoding);
     is = zrealloc(is,sizeof(intset)+size);
@@ -118,31 +118,31 @@ static intset *intsetResize(intset *is, uint32_t len) {
  * sets "pos" to the position of the value within the intset. Return 0 when
  * the value is not present in the intset and sets "pos" to the position
  * where "value" can be inserted. */
-//zw ²éÕÒÔªËØ£¬Èç¹ûÕÒµ½£¬return 1²¢ÉèÖÃposÎª²éÕÒµ½µÄÔªËØ£»Èç¹ûÃ»ÕÒµ½£¬return 0£¬²¢ÉèÖÃposÎª¿ÉÒÔ²åÈëµÄÎ»ÖÃ
-//zw intset ÊÇÓĞĞòµÄ£¬²ÉÓÃ¶ş·Ö²éÕÒ
+//zw æŸ¥æ‰¾å…ƒç´ ï¼Œå¦‚æœæ‰¾åˆ°ï¼Œreturn 1å¹¶è®¾ç½®posä¸ºæŸ¥æ‰¾åˆ°çš„å…ƒç´ ï¼›å¦‚æœæ²¡æ‰¾åˆ°ï¼Œreturn 0ï¼Œå¹¶è®¾ç½®posä¸ºå¯ä»¥æ’å…¥çš„ä½ç½®
+//zw intset æ˜¯æœ‰åºçš„ï¼Œé‡‡ç”¨äºŒåˆ†æŸ¥æ‰¾
 static uint8_t intsetSearch(intset *is, int64_t value, uint32_t *pos) {
     int min = 0, max = intrev32ifbe(is->length)-1, mid = -1;
     int64_t cur = -1;
 
     /* The value can never be found when the set is empty */
-    //zw intset Îª¿Õ
+    //zw intset ä¸ºç©º
     if (intrev32ifbe(is->length) == 0) {
         if (pos) *pos = 0;
         return 0;
     } else {
         /* Check for the case where we know we cannot find the value,
          * but do know the insert position. */
-        //zw value ±È×î´óÔªËØ»¹´ó
+        //zw value æ¯”æœ€å¤§å…ƒç´ è¿˜å¤§
         if (value > _intsetGet(is,intrev32ifbe(is->length)-1)) {
             if (pos) *pos = intrev32ifbe(is->length);
             return 0;
-        //zw value ±È×îĞ¡ÔªËØ»¹Ğ¡
+        //zw value æ¯”æœ€å°å…ƒç´ è¿˜å°
         } else if (value < _intsetGet(is,0)) {
             if (pos) *pos = 0;
             return 0;
         }
     }
-    //zw ¶ş·Ö²éÕÒ
+    //zw äºŒåˆ†æŸ¥æ‰¾
     while(max >= min) {
         mid = ((unsigned int)min + (unsigned int)max) >> 1;
         cur = _intsetGet(is,mid);
@@ -155,47 +155,47 @@ static uint8_t intsetSearch(intset *is, int64_t value, uint32_t *pos) {
         }
     }
     
-    if (value == cur) { //zw ÕÒµ½
+    if (value == cur) { //zw æ‰¾åˆ°
         if (pos) *pos = mid;
         return 1;
-    } else {            //zw Î´ÕÒµ½
+    } else {            //zw æœªæ‰¾åˆ°
         if (pos) *pos = min;
         return 0;
     }
 }
 
 /* Upgrades the intset to a larger encoding and inserts the given integer. */
-//zw ¶Ô±àÂëÀàĞÍ½øĞĞÉı¼¶£¬O(n)  
-//zw ĞèÒª²åÈëµÄÖµ£¬ÒªÃ´±Èµ±Ç°¼¯ºÏÖĞµÄ×î´óÖµ´ó£¬ÒªÃ´±È¼¯ºÏÖĞµÄ×îĞ¡ÖµĞ¡£¬²»È»²»ĞèÒªÉı¼¶  
-//zw ±È×î´óÖµ´ó»¹ÊÇĞ¡£¬Ö»ĞèÒª¸ù¾İvalueµÄÕı¸º¼´¿ÉÅĞ¶Ï  
+//zw å¯¹ç¼–ç ç±»å‹è¿›è¡Œå‡çº§ï¼ŒO(n)  
+//zw éœ€è¦æ’å…¥çš„å€¼ï¼Œè¦ä¹ˆæ¯”å½“å‰é›†åˆä¸­çš„æœ€å¤§å€¼å¤§ï¼Œè¦ä¹ˆæ¯”é›†åˆä¸­çš„æœ€å°å€¼å°ï¼Œä¸ç„¶ä¸éœ€è¦å‡çº§  
+//zw æ¯”æœ€å¤§å€¼å¤§è¿˜æ˜¯å°ï¼Œåªéœ€è¦æ ¹æ®valueçš„æ­£è´Ÿå³å¯åˆ¤æ–­  
 static intset *intsetUpgradeAndAdd(intset *is, int64_t value) {
-    uint8_t curenc = intrev32ifbe(is->encoding);    //zw µ±Ç°±àÂëÀàĞÍ  
-    uint8_t newenc = _intsetValueEncoding(value);   //zw ĞÂµÄ±àÂëÀàĞÍ  
+    uint8_t curenc = intrev32ifbe(is->encoding);    //zw å½“å‰ç¼–ç ç±»å‹  
+    uint8_t newenc = _intsetValueEncoding(value);   //zw æ–°çš„ç¼–ç ç±»å‹  
     int length = intrev32ifbe(is->length);
-    int prepend = value < 0 ? 1 : 0;                //zw ¾ö¶¨ĞÂµÄÖµ²åÈëµÄÎ»ÖÃ(1±íÊ¾Í·£¬0±íÊ¾Î²)  
+    int prepend = value < 0 ? 1 : 0;                //zw å†³å®šæ–°çš„å€¼æ’å…¥çš„ä½ç½®(1è¡¨ç¤ºå¤´ï¼Œ0è¡¨ç¤ºå°¾)  
 
     /* First set new encoding and resize */
-    is->encoding = intrev32ifbe(newenc);            //zw ÉèÖÃ±àÂëÀàĞÍ 
+    is->encoding = intrev32ifbe(newenc);            //zw è®¾ç½®ç¼–ç ç±»å‹ 
     is = intsetResize(is,intrev32ifbe(is->length)+1);
 
     /* Upgrade back-to-front so we don't overwrite values.
      * Note that the "prepend" variable is used to make sure we have an empty
      * space at either the beginning or the end of the intset. */
-    //zw Í¨¹ı_intsetGetEncodedµÃµ½Éı¼¶Ç°µÄ¸ÃÎ»ÖÃµÄÕûÊıÖµ  
-    //zw ÉèÖÃÔ­À´µÄÕûÊı¼¯µÄÖµ£¬Èç¹ûprepend=1±íÊ¾ĞÂÖµÔÚÍ·²åÈë£¬ÄÇÃ´Ô­À´µÄÊıÖµÈ«²¿ÏòºóÆ«ÒÆ 
+    //zw é€šè¿‡_intsetGetEncodedå¾—åˆ°å‡çº§å‰çš„è¯¥ä½ç½®çš„æ•´æ•°å€¼  
+    //zw è®¾ç½®åŸæ¥çš„æ•´æ•°é›†çš„å€¼ï¼Œå¦‚æœprepend=1è¡¨ç¤ºæ–°å€¼åœ¨å¤´æ’å…¥ï¼Œé‚£ä¹ˆåŸæ¥çš„æ•°å€¼å…¨éƒ¨å‘ååç§» 
     while(length--)
         _intsetSet(is,length+prepend,_intsetGetEncoded(is,length,curenc));
 
     /* Set the value at the beginning or the end. */
-    if (prepend)        //zw ÔÚÍ·²åÈë
+    if (prepend)        //zw åœ¨å¤´æ’å…¥
         _intsetSet(is,0,value);
-    else                //zw ÔÚÎ²²åÈë
+    else                //zw åœ¨å°¾æ’å…¥
         _intsetSet(is,intrev32ifbe(is->length),value);
-    //zw ¸üĞÂ´óĞ¡
+    //zw æ›´æ–°å¤§å°
     is->length = intrev32ifbe(intrev32ifbe(is->length)+1);
     return is;
 }
-//zw ÔªËØÒÆ¶¯
+//zw å…ƒç´ ç§»åŠ¨
 static void intsetMoveTail(intset *is, uint32_t from, uint32_t to) {
     void *src, *dst;
     uint32_t bytes = intrev32ifbe(is->length)-from;
@@ -218,7 +218,7 @@ static void intsetMoveTail(intset *is, uint32_t from, uint32_t to) {
 }
 
 /* Insert an integer in the intset */
-//zw Ìí¼ÓÔªËØ
+//zw æ·»åŠ å…ƒç´ 
 intset *intsetAdd(intset *is, int64_t value, uint8_t *success) {
     uint8_t valenc = _intsetValueEncoding(value);
     uint32_t pos;
@@ -227,7 +227,7 @@ intset *intsetAdd(intset *is, int64_t value, uint8_t *success) {
     /* Upgrade encoding if necessary. If we need to upgrade, we know that
      * this value should be either appended (if > 0) or prepended (if < 0),
      * because it lies outside the range of existing values. */
-    //zw ĞèÒªÉı¼¶£¬½øĞĞÉı¼¶²¢²åÈëĞÂÖµ 
+    //zw éœ€è¦å‡çº§ï¼Œè¿›è¡Œå‡çº§å¹¶æ’å…¥æ–°å€¼ 
     if (valenc > intrev32ifbe(is->encoding)) {
         /* This always succeeds, so we don't need to curry *success. */
         return intsetUpgradeAndAdd(is,value);
@@ -235,29 +235,29 @@ intset *intsetAdd(intset *is, int64_t value, uint8_t *success) {
         /* Abort if the value is already present in the set.
          * This call will populate "pos" with the right position to insert
          * the value when it cannot be found. */
-        //zw Èç¹û¸ÃÖµÔÚ¼¯ºÏÖĞÒÑ¾­´æÔÚ£¬ÄÇÃ´Ö±½Ó·µ»Ø
+        //zw å¦‚æœè¯¥å€¼åœ¨é›†åˆä¸­å·²ç»å­˜åœ¨ï¼Œé‚£ä¹ˆç›´æ¥è¿”å›
         if (intsetSearch(is,value,&pos)) {
             if (success) *success = 0;
             return is;
         }
-        //zw ½«´ÓposÎ»ÖÃºóÃæµÄÖµÈ«²¿ÏòºóÆ«ÒÆÒ»¸öÎ»ÖÃ£¬ÎªĞÂÔªËØ¿Õ³öÎ»ÖÃ 
+        //zw å°†ä»posä½ç½®åé¢çš„å€¼å…¨éƒ¨å‘ååç§»ä¸€ä¸ªä½ç½®ï¼Œä¸ºæ–°å…ƒç´ ç©ºå‡ºä½ç½® 
         is = intsetResize(is,intrev32ifbe(is->length)+1);
         if (pos < intrev32ifbe(is->length)) intsetMoveTail(is,pos,pos+1);
     }
 
-    _intsetSet(is,pos,value);   //zw Ìí¼ÓĞÂÔªËØ 
+    _intsetSet(is,pos,value);   //zw æ·»åŠ æ–°å…ƒç´  
     is->length = intrev32ifbe(intrev32ifbe(is->length)+1);
     return is;
 }
 
 /* Delete integer from intset */
-//zw É¾³ıÔªËØ
+//zw åˆ é™¤å…ƒç´ 
 intset *intsetRemove(intset *is, int64_t value, int *success) {
     uint8_t valenc = _intsetValueEncoding(value);
     uint32_t pos;
     if (success) *success = 0;
     
-    //zw valueÔÚÔ­¼¯ºÏÖĞ
+    //zw valueåœ¨åŸé›†åˆä¸­
     if (valenc <= intrev32ifbe(is->encoding) && intsetSearch(is,value,&pos)) {
         uint32_t len = intrev32ifbe(is->length);
 
@@ -265,7 +265,7 @@ intset *intsetRemove(intset *is, int64_t value, int *success) {
         if (success) *success = 1;
 
         /* Overwrite value with tail and update length */
-        //zw Èç¹û pos ²»ÊÇ is µÄ×îÄ©Î²£¬Ö±½ÓÍ¨¹ımemmoveÄÚ´æ¸²¸ÇµÄ·½Ê½É¾³ı¸ÃÕûÊıÖµ£¬²¢µ÷ÕûÄÚ´æ´óĞ¡ºÍÔªËØ¸öÊı
+        //zw å¦‚æœ pos ä¸æ˜¯ is çš„æœ€æœ«å°¾ï¼Œç›´æ¥é€šè¿‡memmoveå†…å­˜è¦†ç›–çš„æ–¹å¼åˆ é™¤è¯¥æ•´æ•°å€¼ï¼Œå¹¶è°ƒæ•´å†…å­˜å¤§å°å’Œå…ƒç´ ä¸ªæ•°
         if (pos < (len-1)) intsetMoveTail(is,pos+1,pos);
         is = intsetResize(is,len-1);
         is->length = intrev32ifbe(len-1);
@@ -274,21 +274,21 @@ intset *intsetRemove(intset *is, int64_t value, int *success) {
 }
 
 /* Determine whether a value belongs to this set */
-//zw ²éÕÒÔªËØ£¬Èç¹ûÕÒµ½ÁË ·µ»Ø1£¬·ñÔò·µ»Ø0
+//zw æŸ¥æ‰¾å…ƒç´ ï¼Œå¦‚æœæ‰¾åˆ°äº† è¿”å›1ï¼Œå¦åˆ™è¿”å›0
 uint8_t intsetFind(intset *is, int64_t value) {
     uint8_t valenc = _intsetValueEncoding(value);
     return valenc <= intrev32ifbe(is->encoding) && intsetSearch(is,value,NULL);
 }
 
 /* Return random member */
-//zw Ëæ»ú·µ»ØÒ»¸öÔªËØ
+//zw éšæœºè¿”å›ä¸€ä¸ªå…ƒç´ 
 int64_t intsetRandom(intset *is) {
     return _intsetGet(is,rand()%intrev32ifbe(is->length));
 }
 
 /* Sets the value to the value at the given position. When this position is
  * out of range the function returns 0, when in range it returns 1. */
-//zw »ñÈ¡posÎ»ÖÃÉÏµÄÔªËØ£¬Èç¹ûÔ½½ç£¬·µ»Ø0£¬·ñÔò·µ»Ø1£¬²¢¸³Öµ¸øvalue
+//zw è·å–posä½ç½®ä¸Šçš„å…ƒç´ ï¼Œå¦‚æœè¶Šç•Œï¼Œè¿”å›0ï¼Œå¦åˆ™è¿”å›1ï¼Œå¹¶èµ‹å€¼ç»™value
 uint8_t intsetGet(intset *is, uint32_t pos, int64_t *value) {
     if (pos < intrev32ifbe(is->length)) {
         *value = _intsetGet(is,pos);
@@ -298,13 +298,13 @@ uint8_t intsetGet(intset *is, uint32_t pos, int64_t *value) {
 }
 
 /* Return intset length */
-//zw »ñÈ¡ÔªËØ¸öÊı
+//zw è·å–å…ƒç´ ä¸ªæ•°
 uint32_t intsetLen(intset *is) {
     return intrev32ifbe(is->length);
 }
 
 /* Return intset blob size in bytes. */
-//zw »ñÈ¡×ÜÄÚ´æ´óĞ¡
+//zw è·å–æ€»å†…å­˜å¤§å°
 size_t intsetBlobLen(intset *is) {
     return sizeof(intset)+intrev32ifbe(is->length)*intrev32ifbe(is->encoding);
 }

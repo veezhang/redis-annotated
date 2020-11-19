@@ -44,21 +44,21 @@
 #include "sha1.h"
 
 /* Glob-style pattern matching. */
-//zw Glob-styleÍ¨Åä·ûÆ¥Åä
+//zw Glob-styleé€šé…ç¬¦åŒ¹é…
 int stringmatchlen(const char *pattern, int patternLen,
         const char *string, int stringLen, int nocase)
 {
     while(patternLen) {
         switch(pattern[0]) {
-        case '*':   //zw Ä£Ê½µÄµ±Ç°×Ö·ûÎª*£¬ÔòÖ»ĞèÒªÄ£Ê½ÖĞÁ¬Ğø*ÒÔºóµÄ²¿·ÖÓë¸ø¶¨stringµÄÄ³ºó²¿·ÖÆ¥Åä¼´¿É 
+        case '*':   //zw æ¨¡å¼çš„å½“å‰å­—ç¬¦ä¸º*ï¼Œåˆ™åªéœ€è¦æ¨¡å¼ä¸­è¿ç»­*ä»¥åçš„éƒ¨åˆ†ä¸ç»™å®šstringçš„æŸåéƒ¨åˆ†åŒ¹é…å³å¯ 
             while (pattern[1] == '*') {
                 pattern++;
                 patternLen--;
             }
-            if (patternLen == 1)//zw µ½´Ë£¬ËµÃ÷Ä£Ê½È«Îª*£¬ µ±È»Æ¥Åä
+            if (patternLen == 1)//zw åˆ°æ­¤ï¼Œè¯´æ˜æ¨¡å¼å…¨ä¸º*ï¼Œ å½“ç„¶åŒ¹é…
                 return 1; /* match */
-            //zw Ä£Ê½Ç°²¿·ÖÈ«Îª*£¬ ÔòÖ»Ğèºó²¿·ÖÓëstring µÄÄ³ºó²¿·ÖÆ¥Åä¼´¿É£¬
-            //zw ÒÀ´ÎÍùºó²éÕÒstringÖĞµÄ¸Ã¡°Ä³ºó²¿·Ö¡±£¬Ö±µ½Æ¥Åä£¬»òÕßµ½Î²²¿  
+            //zw æ¨¡å¼å‰éƒ¨åˆ†å…¨ä¸º*ï¼Œ åˆ™åªéœ€åéƒ¨åˆ†ä¸string çš„æŸåéƒ¨åˆ†åŒ¹é…å³å¯ï¼Œ
+            //zw ä¾æ¬¡å¾€åæŸ¥æ‰¾stringä¸­çš„è¯¥â€œæŸåéƒ¨åˆ†â€ï¼Œç›´åˆ°åŒ¹é…ï¼Œæˆ–è€…åˆ°å°¾éƒ¨  
             while(stringLen) {
                 if (stringmatchlen(pattern+1, patternLen-1,
                             string, stringLen, nocase))
@@ -68,19 +68,19 @@ int stringmatchlen(const char *pattern, int patternLen,
             }
             return 0; /* no match */
             break;
-        case '?':   //zw Ä£Ê½µÄµ±Ç°×Ö·ûÎª£¿ £¬ÔòÖ±½ÓÌø¹ıstringµÄµ±Ç°×Ö·û£¬´ÓÏÂÒ»×Ö·û¿ªÊ¼ÅĞ¶Ï
+        case '?':   //zw æ¨¡å¼çš„å½“å‰å­—ç¬¦ä¸ºï¼Ÿ ï¼Œåˆ™ç›´æ¥è·³è¿‡stringçš„å½“å‰å­—ç¬¦ï¼Œä»ä¸‹ä¸€å­—ç¬¦å¼€å§‹åˆ¤æ–­
             if (stringLen == 0)
                 return 0; /* no match */
             string++;
             stringLen--;
             break;
-        case '[':   //zw Ä£Ê½µÄµ±Ç°×Ö·ûÎª[  £¬·¶Î§£¬ĞèÒª¸ù¾İÏÂÒ»×Ö·ûÈ·¶¨ÊÇÎªÎª ^ 
+        case '[':   //zw æ¨¡å¼çš„å½“å‰å­—ç¬¦ä¸º[  ï¼ŒèŒƒå›´ï¼Œéœ€è¦æ ¹æ®ä¸‹ä¸€å­—ç¬¦ç¡®å®šæ˜¯ä¸ºä¸º ^ 
         {
             int not, match;
 
             pattern++;
             patternLen--;
-            not = pattern[0] == '^';    //zw ÊÇ·ñÎª^
+            not = pattern[0] == '^';    //zw æ˜¯å¦ä¸º^
             if (not) {
                 pattern++;
                 patternLen--;
@@ -92,13 +92,13 @@ int stringmatchlen(const char *pattern, int patternLen,
                     patternLen--;
                     if (pattern[0] == string[0])
                         match = 1;
-                } else if (pattern[0] == ']') { //zw µ½]ÁË
+                } else if (pattern[0] == ']') { //zw åˆ°]äº†
                     break;
-                } else if (patternLen == 0) {   //zw pattern½áÎ²ÁË£¬ switchºóÃæ£¨Line 157£©»á pattern++£¬·ÀÖ¹Ô½½ç
+                } else if (patternLen == 0) {   //zw patternç»“å°¾äº†ï¼Œ switchåé¢ï¼ˆLine 157ï¼‰ä¼š pattern++ï¼Œé˜²æ­¢è¶Šç•Œ
                     pattern--;
                     patternLen++;
                     break;
-                } else if (pattern[1] == '-' && patternLen >= 3) {  //zw Èç[1-8]:¼´1µ½8ÖĞµÄÈÎÒâÒ»¸ö×Ö·û £¬Ö»Òªstringµ±Ç°×Ö·ûÔÚ´Ë·¶Î§ÄÚ
+                } else if (pattern[1] == '-' && patternLen >= 3) {  //zw å¦‚[1-8]:å³1åˆ°8ä¸­çš„ä»»æ„ä¸€ä¸ªå­—ç¬¦ ï¼Œåªè¦stringå½“å‰å­—ç¬¦åœ¨æ­¤èŒƒå›´å†…
                     int start = pattern[0];
                     int end = pattern[2];
                     int c = string[0];

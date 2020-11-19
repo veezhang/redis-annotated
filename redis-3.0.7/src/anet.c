@@ -48,7 +48,7 @@
 
 #include "anet.h"
 
-//zw ´íÎó´¦Àíº¯Êı
+//zw é”™è¯¯å¤„ç†å‡½æ•°
 static void anetSetError(char *err, const char *fmt, ...)
 {
     va_list ap;
@@ -59,7 +59,7 @@ static void anetSetError(char *err, const char *fmt, ...)
     va_end(ap);
 }
 
-//zw ÉèÖÃsocket ÊÇ·ñÎªnoblock
+//zw è®¾ç½®socket æ˜¯å¦ä¸ºnoblock
 int anetSetBlock(char *err, int fd, int non_block) {
     int flags;
 
@@ -83,12 +83,12 @@ int anetSetBlock(char *err, int fd, int non_block) {
     return ANET_OK;
 }
 
-//zw ÉèÖÃsocketÎªnoblock
+//zw è®¾ç½®socketä¸ºnoblock
 int anetNonBlock(char *err, int fd) {
     return anetSetBlock(err,fd,1);
 }
 
-//zw ÉèÖÃsocketÎªblock
+//zw è®¾ç½®socketä¸ºblock
 int anetBlock(char *err, int fd) {
     return anetSetBlock(err,fd,0);
 }
@@ -96,12 +96,12 @@ int anetBlock(char *err, int fd) {
 /* Set TCP keep alive option to detect dead peers. The interval option
  * is only used for Linux as we are using Linux-specific APIs to set
  * the probe send time, interval, and count. */
-//zw ÉèÖÃkeealive±êÖ¾
+//zw è®¾ç½®keealiveæ ‡å¿—
 int anetKeepAlive(char *err, int fd, int interval)
 {
     int val = 1;
     
-    //zw ÉèÖÃsocket SO_KEEPALIVE
+    //zw è®¾ç½®socket SO_KEEPALIVE
     if (setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) == -1)
     {
         anetSetError(err, "setsockopt SO_KEEPALIVE: %s", strerror(errno));
@@ -114,7 +114,7 @@ int anetKeepAlive(char *err, int fd, int interval)
      * actually useful. */
 
     /* Send first probe after interval. */
-    //zw Èç¸ÃÁ¬½ÓÔÚ interval ÃëÄÚÃ»ÓĞÈÎºÎÊı¾İÍùÀ´,Ôò½øĞĞÌ½²â
+    //zw å¦‚è¯¥è¿æ¥åœ¨ interval ç§’å†…æ²¡æœ‰ä»»ä½•æ•°æ®å¾€æ¥,åˆ™è¿›è¡Œæ¢æµ‹
     val = interval;
     if (setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, &val, sizeof(val)) < 0) {
         anetSetError(err, "setsockopt TCP_KEEPIDLE: %s\n", strerror(errno));
@@ -124,7 +124,7 @@ int anetKeepAlive(char *err, int fd, int interval)
     /* Send next probes after the specified interval. Note that we set the
      * delay as interval / 3, as we send three probes before detecting
      * an error (see the next setsockopt call). */
-    //zw Ì½²âÊ±·¢°üµÄÊ±¼ä¼ä¸ôÎª interval/3 Ãë
+    //zw æ¢æµ‹æ—¶å‘åŒ…çš„æ—¶é—´é—´éš”ä¸º interval/3 ç§’
     val = interval/3;
     if (val == 0) val = 1;
     if (setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, &val, sizeof(val)) < 0) {
@@ -134,7 +134,7 @@ int anetKeepAlive(char *err, int fd, int interval)
 
     /* Consider the socket in error state after three we send three ACK
      * probes without getting a reply. */
-    //zw Ì½²â³¢ÊÔµÄ´ÎÊı.Èç¹ûµÚ1´ÎÌ½²â°ü¾ÍÊÕµ½ÏìÓ¦ÁË,Ôòºó2´ÎµÄ²»ÔÙ·¢
+    //zw æ¢æµ‹å°è¯•çš„æ¬¡æ•°.å¦‚æœç¬¬1æ¬¡æ¢æµ‹åŒ…å°±æ”¶åˆ°å“åº”äº†,åˆ™å2æ¬¡çš„ä¸å†å‘
     val = 3;
     if (setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, &val, sizeof(val)) < 0) {
         anetSetError(err, "setsockopt TCP_KEEPCNT: %s\n", strerror(errno));
@@ -283,27 +283,27 @@ static int anetTcpGenericConnect(char *err, char *addr, int port,
 
     snprintf(portstr,sizeof(portstr),"%d",port);
     memset(&hints,0,sizeof(hints));
-    hints.ai_family = AF_UNSPEC;    //zw AF_INET:IPv4, AF_INET6:IPv6, AF_UNSPEC:Ğ­ÒéÎŞ¹Ø
+    hints.ai_family = AF_UNSPEC;    //zw AF_INET:IPv4, AF_INET6:IPv6, AF_UNSPEC:åè®®æ— å…³
     hints.ai_socktype = SOCK_STREAM;//zw SOCK_STREAM:TCP, SOCK_DGRAM:UDP
     //zw hints.ai_protocol -> IPPROTO_IP,IPPROTO_IPV4,IPPROTO_IPV6,IPPROTO_UDP,IPPROTO_TCP
-    //zw hints.ai_flags    -> AI_PASSIVE 1, AI_CANONNAME 2, AI_NUMERICHOST 4 Î»
+    //zw hints.ai_flags    -> AI_PASSIVE 1, AI_CANONNAME 2, AI_NUMERICHOST 4 ä½
     /* zw
-     * gethostbynameºÍgethostbyaddrÕâÁ½¸öº¯Êı½ö½öÖ§³ÖIPv4
-     * getaddrinfoº¯ÊıÄÜ¹»´¦ÀíÃû×Öµ½µØÖ·ÒÔ¼°·şÎñµ½¶Ë¿ÚÕâÁ½ÖÖ×ª»»£¬·µ»ØµÄÊÇÒ»¸ösockaddr½á¹¹µÄÁ´±í¶ø²»ÊÇÒ»¸öµØÖ·Çåµ¥
-     * ÕâĞ©sockaddr½á¹¹Ëæºó¿ÉÓÉÌ×½Ó¿Úº¯ÊıÖ±½ÓÊ¹ÓÃ¡£
+     * gethostbynameå’Œgethostbyaddrè¿™ä¸¤ä¸ªå‡½æ•°ä»…ä»…æ”¯æŒIPv4
+     * getaddrinfoå‡½æ•°èƒ½å¤Ÿå¤„ç†åå­—åˆ°åœ°å€ä»¥åŠæœåŠ¡åˆ°ç«¯å£è¿™ä¸¤ç§è½¬æ¢ï¼Œè¿”å›çš„æ˜¯ä¸€ä¸ªsockaddrç»“æ„çš„é“¾è¡¨è€Œä¸æ˜¯ä¸€ä¸ªåœ°å€æ¸…å•
+     * è¿™äº›sockaddrç»“æ„éšåå¯ç”±å¥—æ¥å£å‡½æ•°ç›´æ¥ä½¿ç”¨ã€‚
      * int getaddrinfo( const char *hostname, const char *service, const struct addrinfo *hints, struct addrinfo **result );
-     * hostname:Ò»¸öÖ÷»úÃû»òÕßµØÖ·´®(IPv4µÄµã·ÖÊ®½øÖÆ´®»òÕßIPv6µÄ16½øÖÆ´®)
-     * service£º·şÎñÃû¿ÉÒÔÊÇÊ®½øÖÆµÄ¶Ë¿ÚºÅ£¬Ò²¿ÉÒÔÊÇÒÑ¶¨ÒåµÄ·şÎñÃû³Æ£¬Èçftp¡¢httpµÈ
-     * hints£º¿ÉÒÔÊÇÒ»¸ö¿ÕÖ¸Õë£¬Ò²¿ÉÒÔÊÇÒ»¸öÖ¸ÏòÄ³¸öaddrinfo½á¹¹ÌåµÄÖ¸Õë£¬µ÷ÓÃÕßÔÚÕâ¸ö½á¹¹ÖĞÌîÈë¹ØÓÚÆÚÍû·µ»ØµÄĞÅÏ¢ÀàĞÍµÄ°µÊ¾¡£
-     * result£º±¾º¯ÊıÍ¨¹ıresultÖ¸Õë²ÎÊı·µ»ØÒ»¸öÖ¸Ïòaddrinfo½á¹¹ÌåÁ´±íµÄÖ¸Õë¡£
-     * ·µ»ØÖµ£º0¡ª¡ª³É¹¦£¬·Ç0¡ª¡ª³ö´í
+     * hostname:ä¸€ä¸ªä¸»æœºåæˆ–è€…åœ°å€ä¸²(IPv4çš„ç‚¹åˆ†åè¿›åˆ¶ä¸²æˆ–è€…IPv6çš„16è¿›åˆ¶ä¸²)
+     * serviceï¼šæœåŠ¡åå¯ä»¥æ˜¯åè¿›åˆ¶çš„ç«¯å£å·ï¼Œä¹Ÿå¯ä»¥æ˜¯å·²å®šä¹‰çš„æœåŠ¡åç§°ï¼Œå¦‚ftpã€httpç­‰
+     * hintsï¼šå¯ä»¥æ˜¯ä¸€ä¸ªç©ºæŒ‡é’ˆï¼Œä¹Ÿå¯ä»¥æ˜¯ä¸€ä¸ªæŒ‡å‘æŸä¸ªaddrinfoç»“æ„ä½“çš„æŒ‡é’ˆï¼Œè°ƒç”¨è€…åœ¨è¿™ä¸ªç»“æ„ä¸­å¡«å…¥å…³äºæœŸæœ›è¿”å›çš„ä¿¡æ¯ç±»å‹çš„æš—ç¤ºã€‚
+     * resultï¼šæœ¬å‡½æ•°é€šè¿‡resultæŒ‡é’ˆå‚æ•°è¿”å›ä¸€ä¸ªæŒ‡å‘addrinfoç»“æ„ä½“é“¾è¡¨çš„æŒ‡é’ˆã€‚
+     * è¿”å›å€¼ï¼š0â€”â€”æˆåŠŸï¼Œé0â€”â€”å‡ºé”™
      * 
      */
     if ((rv = getaddrinfo(addr,portstr,&hints,&servinfo)) != 0) {
         anetSetError(err, "%s", gai_strerror(rv));
         return ANET_ERR;
     }
-    //zw ·µ»ØÀ´µÄÊÇÒ»¸öÁĞ±í
+    //zw è¿”å›æ¥çš„æ˜¯ä¸€ä¸ªåˆ—è¡¨
     for (p = servinfo; p != NULL; p = p->ai_next) {
         /* Try to create the socket and to connect it.
          * If we fail in the socket() call, or on connect(), we retry with

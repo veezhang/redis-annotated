@@ -28,12 +28,12 @@
  */
 
 /* Exported API */
-void bioInit(void);     //zw ³õÊ¼»¯
-void bioCreateBackgroundJob(int type, void *arg1, void *arg2, void *arg3);  //zw ´´½¨ ºóÌ¨×÷Òµ
-unsigned long long bioPendingJobsOfType(int type);              //zw ¹Ò»úµÄ×÷Òµ (Î´ÊµÏÖ)
-void bioWaitPendingJobsLE(int type, unsigned long long num);    //zw µÈ´ınum¸ö¹ÒÆğµÄ×÷Òµ (Î´ÊµÏÖ)
-time_t bioOlderJobOfType(int type);                             //zw (Î´ÊµÏÖ)
-void bioKillThreads(void);                                      //zw É±ËÀÏß³Ì redisÖ»ÓĞcrashÊ±ºò²Å»áÓÃ SIGSEGV
+void bioInit(void);     //zw åˆå§‹åŒ–
+void bioCreateBackgroundJob(int type, void *arg1, void *arg2, void *arg3);  //zw åˆ›å»º åå°ä½œä¸š
+unsigned long long bioPendingJobsOfType(int type);              //zw æŒ‚æœºçš„ä½œä¸š (æœªå®ç°)
+void bioWaitPendingJobsLE(int type, unsigned long long num);    //zw ç­‰å¾…numä¸ªæŒ‚èµ·çš„ä½œä¸š (æœªå®ç°)
+time_t bioOlderJobOfType(int type);                             //zw (æœªå®ç°)
+void bioKillThreads(void);                                      //zw æ€æ­»çº¿ç¨‹ redisåªæœ‰crashæ—¶å€™æ‰ä¼šç”¨ SIGSEGV
 
 /* Background job opcodes */
 #define REDIS_BIO_CLOSE_FILE    0 /* Deferred close(2) syscall. */

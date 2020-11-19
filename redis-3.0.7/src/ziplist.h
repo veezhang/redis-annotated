@@ -37,29 +37,29 @@ http://www.programering.com/a/MjM3QDMwATY.html
 #define ZIPLIST_HEAD 0
 #define ZIPLIST_TAIL 1
 
-//zw ´´½¨Ò»¸öĞÂµÄziplist
+//zw åˆ›å»ºä¸€ä¸ªæ–°çš„ziplist
 unsigned char *ziplistNew(void);
-//zw ÏòzlÖĞpushÒ»¸öentry£¬ Í·²å»òÎ²²å
+//zw å‘zlä¸­pushä¸€ä¸ªentryï¼Œ å¤´æ’æˆ–å°¾æ’
 unsigned char *ziplistPush(unsigned char *zl, unsigned char *s, unsigned int slen, int where);
-//zw ±éÀúzl£¬ÕÒµ½indexËùÔÚÎ»ÖÃµÄÍ·Ö¸Õë£¬Èç¹û³¬³ö·¶Î§Ôò·µ»ØNULLÖ¸Õë, index¿ÉÕı¿É¸º
+//zw éå†zlï¼Œæ‰¾åˆ°indexæ‰€åœ¨ä½ç½®çš„å¤´æŒ‡é’ˆï¼Œå¦‚æœè¶…å‡ºèŒƒå›´åˆ™è¿”å›NULLæŒ‡é’ˆ, indexå¯æ­£å¯è´Ÿ
 unsigned char *ziplistIndex(unsigned char *zl, int index);
-//zw ÊäÈëµ±Ç°entryµÄÍ·Ö¸Õëp£¬µÃµ½ÏÂÒ»¸öentryµÄÍ·Ö¸Õë£¬Èç¹û²»´æÔÚ£¬·µ»ØNULL
+//zw è¾“å…¥å½“å‰entryçš„å¤´æŒ‡é’ˆpï¼Œå¾—åˆ°ä¸‹ä¸€ä¸ªentryçš„å¤´æŒ‡é’ˆï¼Œå¦‚æœä¸å­˜åœ¨ï¼Œè¿”å›NULL
 unsigned char *ziplistNext(unsigned char *zl, unsigned char *p);
-//zw ÊäÈëzlÖĞµÄÒ»¸öentryµÄÍ·Ö¸Õëp£¬·µ»ØÆäÇ°Ò»¸öÔªËØµÄÍ·Ö¸Õë£¬Èç¹û²»´æÔÚ£¬·µ»ØNULL
+//zw è¾“å…¥zlä¸­çš„ä¸€ä¸ªentryçš„å¤´æŒ‡é’ˆpï¼Œè¿”å›å…¶å‰ä¸€ä¸ªå…ƒç´ çš„å¤´æŒ‡é’ˆï¼Œå¦‚æœä¸å­˜åœ¨ï¼Œè¿”å›NULL
 unsigned char *ziplistPrev(unsigned char *zl, unsigned char *p);
-//zw ¸ù¾İentryµÄÍ·Ö¸Õë£¬ÌáÈ¡ÆäÖĞµÄÄÚÈİ£¬Èç¹ûpÎªNULL»òÕßÊÇÎ²½Úµã£¬Ôò·µ»Ø0£¬·ñÔò·µ»Ø1.
+//zw æ ¹æ®entryçš„å¤´æŒ‡é’ˆï¼Œæå–å…¶ä¸­çš„å†…å®¹ï¼Œå¦‚æœpä¸ºNULLæˆ–è€…æ˜¯å°¾èŠ‚ç‚¹ï¼Œåˆ™è¿”å›0ï¼Œå¦åˆ™è¿”å›1.
 unsigned int ziplistGet(unsigned char *p, unsigned char **sval, unsigned int *slen, long long *lval);
-//zw ÔÚzlµÄpÎ»ÖÃ´æÈëÔªËØs
+//zw åœ¨zlçš„pä½ç½®å­˜å…¥å…ƒç´ s
 unsigned char *ziplistInsert(unsigned char *zl, unsigned char *p, unsigned char *s, unsigned int slen);
-//zw É¾³ı*pÖ¸Ïòentry£¬²¢·µ»ØÏÂÒ»¸öentryµÄÍ·Ö¸Õë*p
+//zw åˆ é™¤*pæŒ‡å‘entryï¼Œå¹¶è¿”å›ä¸‹ä¸€ä¸ªentryçš„å¤´æŒ‡é’ˆ*p
 unsigned char *ziplistDelete(unsigned char *zl, unsigned char **p);
-//zw ´Óindex£¬¿ªÊ¼£¬É¾³ınum¸öentry
+//zw ä»indexï¼Œå¼€å§‹ï¼Œåˆ é™¤numä¸ªentry
 unsigned char *ziplistDeleteRange(unsigned char *zl, unsigned int index, unsigned int num);
-//zw °Ñp¿ªÊ¼µÄentryËù°üº¬µÄvalueºÍ³¤¶ÈÎªslenµÄsstr´®×÷±È½Ï
+//zw æŠŠpå¼€å§‹çš„entryæ‰€åŒ…å«çš„valueå’Œé•¿åº¦ä¸ºslençš„ssträ¸²ä½œæ¯”è¾ƒ
 unsigned int ziplistCompare(unsigned char *p, unsigned char *s, unsigned int slen);
-//zw ÕÒµ½ziplistÖĞ°üº¬¸ø¶¨Êı¾İµÄ½Úµã£¬Ã»¹ıskip¸öÕÒÒ»ÏÂ£¬skip=2£¬0-3-6-9¡£¡£¡£
+//zw æ‰¾åˆ°ziplistä¸­åŒ…å«ç»™å®šæ•°æ®çš„èŠ‚ç‚¹ï¼Œæ²¡è¿‡skipä¸ªæ‰¾ä¸€ä¸‹ï¼Œskip=2ï¼Œ0-3-6-9ã€‚ã€‚ã€‚
 unsigned char *ziplistFind(unsigned char *p, unsigned char *vstr, unsigned int vlen, unsigned int skip);
-//zw ·µ»ØzlËù°üº¬µÄentryÊıÁ¿
+//zw è¿”å›zlæ‰€åŒ…å«çš„entryæ•°é‡
 unsigned int ziplistLen(unsigned char *zl);
-//zw µÃµ½zlÕû¸öÕ¼ÓÃµÄÄÚ´æ´óĞ¡£¬µ¥Î»bytes
+//zw å¾—åˆ°zlæ•´ä¸ªå ç”¨çš„å†…å­˜å¤§å°ï¼Œå•ä½bytes
 size_t ziplistBlobLen(unsigned char *zl);

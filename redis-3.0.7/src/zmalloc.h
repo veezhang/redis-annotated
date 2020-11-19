@@ -32,11 +32,11 @@
 #define __ZMALLOC_H
 
 /* Double expansion needed for stringification of macro values. */
-//zw #ÊÇ°Ñ²ÎÊı×Ö·û´®»¯,##ÊÇÁ¬½ÓÁ½¸ö²ÎÊı³ÉÎªÒ»¸öÕûÌå
+//zw #æ˜¯æŠŠå‚æ•°å­—ç¬¦ä¸²åŒ–,##æ˜¯è¿æ¥ä¸¤ä¸ªå‚æ•°æˆä¸ºä¸€ä¸ªæ•´ä½“
 #define __xstr(s) __str(s)
 #define __str(s) #s
 
-//zw Ê¹ÓÃtcmalloc¿â 1.6¼°ÒÔÉÏ°æ±¾
+//zw ä½¿ç”¨tcmallocåº“ 1.6åŠä»¥ä¸Šç‰ˆæœ¬
 #if defined(USE_TCMALLOC)
 #define ZMALLOC_LIB ("tcmalloc-" __xstr(TC_VERSION_MAJOR) "." __xstr(TC_VERSION_MINOR))
 #include <google/tcmalloc.h>
@@ -47,7 +47,7 @@
 #error "Newer version of tcmalloc required"
 #endif
 
-//zw Ê¹ÓÃjemalloc¿â 2.1¼°ÒÔÉÏ°æ±¾
+//zw ä½¿ç”¨jemallocåº“ 2.1åŠä»¥ä¸Šç‰ˆæœ¬
 #elif defined(USE_JEMALLOC)
 #define ZMALLOC_LIB ("jemalloc-" __xstr(JEMALLOC_VERSION_MAJOR) "." __xstr(JEMALLOC_VERSION_MINOR) "." __xstr(JEMALLOC_VERSION_BUGFIX))
 #include <jemalloc/jemalloc.h>
@@ -65,24 +65,24 @@
 #define zmalloc_size(p) malloc_size(p)
 #endif
 
-//zw Ä¬ÈÏÊ¹ÓÃlibc
+//zw é»˜è®¤ä½¿ç”¨libc
 #ifndef ZMALLOC_LIB
 #define ZMALLOC_LIB "libc"
 #endif
 
-void *zmalloc(size_t size); //zw ·ÖÅäÄÚ´æ
-void *zcalloc(size_t size); //zw ·ÖÅäÄÚ´æ²¢ÇåÁã
-void *zrealloc(void *ptr, size_t size); //zw ÖØĞÂ·ÖÅäÄÚ´æ,µ÷Õû´óĞ¡
-void zfree(void *ptr);  //zw ÊÍ·ÅÄÚ´æ
-char *zstrdup(const char *s); //zw ×Ö·û´®¿½±´£¬·µ»ØµÄĞèÒªÊÍ·Å
-size_t zmalloc_used_memory(void); //zw ·µ»ØÄÚ´æÊ¹ÓÃµÄ´óĞ¡
-void zmalloc_enable_thread_safeness(void); //zw ÔÊĞíÏß³Ì°²È«
-void zmalloc_set_oom_handler(void (*oom_handler)(size_t)); //zw Out Of Memory ´¦Àíº¯Êı
-float zmalloc_get_fragmentation_ratio(size_t rss); //zw ÄÚ´æËéÆ¬±È/ÄÚ´æÊ¹ÓÃÂÊ rss/zmalloc_used_memory 
-size_t zmalloc_get_rss(void); //zw RSS: "Resident Set Size", Êµ¼Ê×¤Áô"ÔÚÄÚ´æÖĞ"µÄÄÚ´æÊı. ²»°üÀ¨ÒÑ¾­½»»»³öÈ¥µÄ´úÂë
-size_t zmalloc_get_private_dirty(void); //zw ½ø³ÌforkÖ®ºó×Ó½ø³Ì¶àÕ¼ÓÃµÄÄÚ´æ ½ø³ÌforkÖ®ºó£¬¿ªÊ¼ÄÚ´æÊÇ¹²ÏíµÄ£¬¼´´Ó¸¸½ø³ÌÄÇÀï¼Ì³ĞµÄÄÚ´æ¿Õ¼ä¶¼ÊÇPrivate_Clean,ÔËĞĞÒ»¶ÎÊ±¼äÖ®ºó,×Ó½ø³Ì¶Ô¼Ì³ĞµÄÄÚ´æ¿Õ¼ä×öÁËĞŞ¸Ä£¬Õâ²¿·ÖÄÚ´æ¾Í²»ÄÜÓë¸¸½ø³Ì¹²ÏíÁË£¬ĞèÒª¶àÕ¼ÓÃ£¬Õâ²¿·Ö¾ÍÊÇPrivate_Dirty
+void *zmalloc(size_t size); //zw åˆ†é…å†…å­˜
+void *zcalloc(size_t size); //zw åˆ†é…å†…å­˜å¹¶æ¸…é›¶
+void *zrealloc(void *ptr, size_t size); //zw é‡æ–°åˆ†é…å†…å­˜,è°ƒæ•´å¤§å°
+void zfree(void *ptr);  //zw é‡Šæ”¾å†…å­˜
+char *zstrdup(const char *s); //zw å­—ç¬¦ä¸²æ‹·è´ï¼Œè¿”å›çš„éœ€è¦é‡Šæ”¾
+size_t zmalloc_used_memory(void); //zw è¿”å›å†…å­˜ä½¿ç”¨çš„å¤§å°
+void zmalloc_enable_thread_safeness(void); //zw å…è®¸çº¿ç¨‹å®‰å…¨
+void zmalloc_set_oom_handler(void (*oom_handler)(size_t)); //zw Out Of Memory å¤„ç†å‡½æ•°
+float zmalloc_get_fragmentation_ratio(size_t rss); //zw å†…å­˜ç¢ç‰‡æ¯”/å†…å­˜ä½¿ç”¨ç‡ rss/zmalloc_used_memory 
+size_t zmalloc_get_rss(void); //zw RSS: "Resident Set Size", å®é™…é©»ç•™"åœ¨å†…å­˜ä¸­"çš„å†…å­˜æ•°. ä¸åŒ…æ‹¬å·²ç»äº¤æ¢å‡ºå»çš„ä»£ç 
+size_t zmalloc_get_private_dirty(void); //zw è¿›ç¨‹forkä¹‹åå­è¿›ç¨‹å¤šå ç”¨çš„å†…å­˜ è¿›ç¨‹forkä¹‹åï¼Œå¼€å§‹å†…å­˜æ˜¯å…±äº«çš„ï¼Œå³ä»çˆ¶è¿›ç¨‹é‚£é‡Œç»§æ‰¿çš„å†…å­˜ç©ºé—´éƒ½æ˜¯Private_Clean,è¿è¡Œä¸€æ®µæ—¶é—´ä¹‹å,å­è¿›ç¨‹å¯¹ç»§æ‰¿çš„å†…å­˜ç©ºé—´åšäº†ä¿®æ”¹ï¼Œè¿™éƒ¨åˆ†å†…å­˜å°±ä¸èƒ½ä¸çˆ¶è¿›ç¨‹å…±äº«äº†ï¼Œéœ€è¦å¤šå ç”¨ï¼Œè¿™éƒ¨åˆ†å°±æ˜¯Private_Dirty
 size_t zmalloc_get_smap_bytes_by_field(char *field);
-void zlibc_free(void *ptr); //zw ÄÚ´æÊÍ·Å
+void zlibc_free(void *ptr); //zw å†…å­˜é‡Šæ”¾
 
 #ifndef HAVE_MALLOC_SIZE
 size_t zmalloc_size(void *ptr);

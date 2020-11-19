@@ -33,64 +33,64 @@
 
 /* Node, List, and Iterator are the only data structures used currently. */
 
-//zw Ë«ÏòÁ´±í½áµã
+//zw åŒå‘é“¾è¡¨ç»“ç‚¹
 typedef struct listNode {
     struct listNode *prev;
     struct listNode *next;
     void *value;
 } listNode;
 
-//zw Á´±íµü´úÆ÷ Ë«Ïò±éÀú
+//zw é“¾è¡¨è¿­ä»£å™¨ åŒå‘éå†
 typedef struct listIter {
     listNode *next;
     int direction;
 } listIter;
 
-//zw Ë«ÏòÁ´±í
+//zw åŒå‘é“¾è¡¨
 typedef struct list {
-    listNode *head;                                 //zw Í·½áµã
-    listNode *tail;                                 //zw Î²½Úµã
-    void *(*dup)(void *ptr);                        //zw ¸´ÖÆÁ´±í
-    void (*free)(void *ptr);                        //zw ÊÍ·ÅÁ´±í
-    int (*match)(void *ptr, void *key);             //zw Æ¥Åä
-    unsigned long len;                              //zw ³¤¶È
+    listNode *head;                                 //zw å¤´ç»“ç‚¹
+    listNode *tail;                                 //zw å°¾èŠ‚ç‚¹
+    void *(*dup)(void *ptr);                        //zw å¤åˆ¶é“¾è¡¨
+    void (*free)(void *ptr);                        //zw é‡Šæ”¾é“¾è¡¨
+    int (*match)(void *ptr, void *key);             //zw åŒ¹é…
+    unsigned long len;                              //zw é•¿åº¦
 } list;
 
 /* Functions implemented as macros */
-#define listLength(l) ((l)->len)                    //zw Á´±í³¤¶È
-#define listFirst(l) ((l)->head)                    //zw Á´±íÍ·½áµã
-#define listLast(l) ((l)->tail)                     //zw Á´±íÎ²½áµã
-#define listPrevNode(n) ((n)->prev)                 //zw ½áµãµÄÇ°Ò»¸ö½áµã
-#define listNextNode(n) ((n)->next)                 //zw ½áµãµÄºóÒ»¸ö½áµã
-#define listNodeValue(n) ((n)->value)               //zw ½áµãµÄÖµ
+#define listLength(l) ((l)->len)                    //zw é“¾è¡¨é•¿åº¦
+#define listFirst(l) ((l)->head)                    //zw é“¾è¡¨å¤´ç»“ç‚¹
+#define listLast(l) ((l)->tail)                     //zw é“¾è¡¨å°¾ç»“ç‚¹
+#define listPrevNode(n) ((n)->prev)                 //zw ç»“ç‚¹çš„å‰ä¸€ä¸ªç»“ç‚¹
+#define listNextNode(n) ((n)->next)                 //zw ç»“ç‚¹çš„åä¸€ä¸ªç»“ç‚¹
+#define listNodeValue(n) ((n)->value)               //zw ç»“ç‚¹çš„å€¼
 
-#define listSetDupMethod(l,m) ((l)->dup = (m))      //zw ÉèÖÃ¸³Öµº¯Êı
-#define listSetFreeMethod(l,m) ((l)->free = (m))    //zw ÉèÖÃÊÍ·Åº¯Êı
-#define listSetMatchMethod(l,m) ((l)->match = (m))  //zw ÉèÖÃÆ¥Åäº¯Êı
+#define listSetDupMethod(l,m) ((l)->dup = (m))      //zw è®¾ç½®èµ‹å€¼å‡½æ•°
+#define listSetFreeMethod(l,m) ((l)->free = (m))    //zw è®¾ç½®é‡Šæ”¾å‡½æ•°
+#define listSetMatchMethod(l,m) ((l)->match = (m))  //zw è®¾ç½®åŒ¹é…å‡½æ•°
 
-#define listGetDupMethod(l) ((l)->dup)              //zw »ñÈ¡¸³Öµº¯Êı
-#define listGetFree(l) ((l)->free)                  //zw »ñÈ¡ÊÍ·Åº¯Êı
-#define listGetMatchMethod(l) ((l)->match)          //zw »ñÈ¡Æ¥Åäº¯Êı
+#define listGetDupMethod(l) ((l)->dup)              //zw è·å–èµ‹å€¼å‡½æ•°
+#define listGetFree(l) ((l)->free)                  //zw è·å–é‡Šæ”¾å‡½æ•°
+#define listGetMatchMethod(l) ((l)->match)          //zw è·å–åŒ¹é…å‡½æ•°
 
 /* Prototypes */
-list *listCreate(void);                             //zw ´´½¨Á´±í
-void listRelease(list *list);                       //zw ÊÍ·ÅÁ´±í
-list *listAddNodeHead(list *list, void *value);     //zw Í·Ìí¼Ó½áµã
-list *listAddNodeTail(list *list, void *value);     //zw Î²Ìí¼Ó½áµã
-list *listInsertNode(list *list, listNode *old_node, void *value, int after);   //zw ÔÚÄ³½áµãÇ°»òºó²åÈë½áµã
-void listDelNode(list *list, listNode *node);       //zw É¾³ı½áµã
-listIter *listGetIterator(list *list, int direction);//zw »ñÈ¡µü´úÆ÷
-listNode *listNext(listIter *iter);                 //zw µü´úÆ÷Ö¸ÏòÏÂÒ»¸ö
-void listReleaseIterator(listIter *iter);           //zw ÊÍ·Åµü´úÆ÷
-list *listDup(list *orig);                          //zw Á´±í¸´ÖÆ
-listNode *listSearchKey(list *list, void *key);     //zw Á´±í²éÑ¯
-listNode *listIndex(list *list, long index);        //zw Á´±íÏÂ±ê²Ù×÷, ¿ÉÒÔÕı¸º
-void listRewind(list *list, listIter *li);          //zw ÖØÖÃµü´úÆ÷´ÓÍ·¿ªÊ¼
-void listRewindTail(list *list, listIter *li);      //zw ÖØÖÃµü´úÆ÷´ÓÎ²¿ªÊ¼
-void listRotate(list *list);                        //zw Ğı×ªÁ´±í£¬ ½«×îºóÒ»¸ö·ÅÖÃ×îÇ°
+list *listCreate(void);                             //zw åˆ›å»ºé“¾è¡¨
+void listRelease(list *list);                       //zw é‡Šæ”¾é“¾è¡¨
+list *listAddNodeHead(list *list, void *value);     //zw å¤´æ·»åŠ ç»“ç‚¹
+list *listAddNodeTail(list *list, void *value);     //zw å°¾æ·»åŠ ç»“ç‚¹
+list *listInsertNode(list *list, listNode *old_node, void *value, int after);   //zw åœ¨æŸç»“ç‚¹å‰æˆ–åæ’å…¥ç»“ç‚¹
+void listDelNode(list *list, listNode *node);       //zw åˆ é™¤ç»“ç‚¹
+listIter *listGetIterator(list *list, int direction);//zw è·å–è¿­ä»£å™¨
+listNode *listNext(listIter *iter);                 //zw è¿­ä»£å™¨æŒ‡å‘ä¸‹ä¸€ä¸ª
+void listReleaseIterator(listIter *iter);           //zw é‡Šæ”¾è¿­ä»£å™¨
+list *listDup(list *orig);                          //zw é“¾è¡¨å¤åˆ¶
+listNode *listSearchKey(list *list, void *key);     //zw é“¾è¡¨æŸ¥è¯¢
+listNode *listIndex(list *list, long index);        //zw é“¾è¡¨ä¸‹æ ‡æ“ä½œ, å¯ä»¥æ­£è´Ÿ
+void listRewind(list *list, listIter *li);          //zw é‡ç½®è¿­ä»£å™¨ä»å¤´å¼€å§‹
+void listRewindTail(list *list, listIter *li);      //zw é‡ç½®è¿­ä»£å™¨ä»å°¾å¼€å§‹
+void listRotate(list *list);                        //zw æ—‹è½¬é“¾è¡¨ï¼Œ å°†æœ€åä¸€ä¸ªæ”¾ç½®æœ€å‰
 
 /* Directions for iterators */
-#define AL_START_HEAD 0                             //zw µü´úÆ÷´ÓÍ·¿ªÊ¼
-#define AL_START_TAIL 1                             //zw µü´úÆ÷´ÓÎ²¿ªÊ¼
+#define AL_START_HEAD 0                             //zw è¿­ä»£å™¨ä»å¤´å¼€å§‹
+#define AL_START_TAIL 1                             //zw è¿­ä»£å™¨ä»å°¾å¼€å§‹
 
 #endif /* __ADLIST_H__ */

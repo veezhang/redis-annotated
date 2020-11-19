@@ -35,7 +35,7 @@
 #ifdef __CYGWIN__
 #define strtold(a,b) ((long double)strtod((a),(b)))
 #endif
-//zw ´´½¨redisObject£¬encodingÎªREDIS_ENCODING_RAW
+//zw åˆ›å»ºredisObjectï¼Œencodingä¸ºREDIS_ENCODING_RAW
 robj *createObject(int type, void *ptr) {
     robj *o = zmalloc(sizeof(*o));
     o->type = type;
@@ -50,7 +50,7 @@ robj *createObject(int type, void *ptr) {
 
 /* Create a string object with encoding REDIS_ENCODING_RAW, that is a plain
  * string object where o->ptr points to a proper sds string. */
-//zw ÓÃÔ­Ê¼µÄ×Ö·û´®(char*) ´´½¨Ò»¸öredisObject£¬»áÄ¬ÈÏ×ª»¯Îªsds×Ö·û´®
+//zw ç”¨åŸå§‹çš„å­—ç¬¦ä¸²(char*) åˆ›å»ºä¸€ä¸ªredisObjectï¼Œä¼šé»˜è®¤è½¬åŒ–ä¸ºsdså­—ç¬¦ä¸²
 robj *createRawStringObject(char *ptr, size_t len) {
     return createObject(REDIS_STRING,sdsnewlen(ptr,len));
 }
@@ -58,15 +58,15 @@ robj *createRawStringObject(char *ptr, size_t len) {
 /* Create a string object with encoding REDIS_ENCODING_EMBSTR, that is
  * an object where the sds string is actually an unmodifiable string
  * allocated in the same chunk as the object itself. */
-//zw ÓÃÔ­Ê¼µÄ×Ö·û´®(char*) ´´½¨Ò»¸öredisObject£¬»áÄ¬ÈÏ×ª»¯Îªsds×Ö·û´®£¬REDIS_ENCODING_EMBSTRÀàĞÍ
-//zw REDIS_ENCODING_EMBSTR ±íÊ¾Á¬ĞøµÄÄÚ´æ£¬¼´ robj Í·ºÍ ptrÖ¸ÏòµÄµØÖ·ÔÚÁ¬ĞøµÄÄÚ´æÇøÓò
+//zw ç”¨åŸå§‹çš„å­—ç¬¦ä¸²(char*) åˆ›å»ºä¸€ä¸ªredisObjectï¼Œä¼šé»˜è®¤è½¬åŒ–ä¸ºsdså­—ç¬¦ä¸²ï¼ŒREDIS_ENCODING_EMBSTRç±»å‹
+//zw REDIS_ENCODING_EMBSTR è¡¨ç¤ºè¿ç»­çš„å†…å­˜ï¼Œå³ robj å¤´å’Œ ptræŒ‡å‘çš„åœ°å€åœ¨è¿ç»­çš„å†…å­˜åŒºåŸŸ
 robj *createEmbeddedStringObject(char *ptr, size_t len) {
     robj *o = zmalloc(sizeof(robj)+sizeof(struct sdshdr)+len+1);
-    struct sdshdr *sh = (void*)(o+1);   //zw oÄÚ´æºóÃæµÄµØÖ·
+    struct sdshdr *sh = (void*)(o+1);   //zw oå†…å­˜åé¢çš„åœ°å€
 
     o->type = REDIS_STRING;
     o->encoding = REDIS_ENCODING_EMBSTR;
-    o->ptr = sh+1;                      //zw shÄÚ´æºóÃæµÄµØÖ·£¬Ò²¾ÍÊÇ¶ÔÓ¦sdshdrÖĞµÄbuf(struct sdshdr { unsigned int len; unsigned int free; char buf[];};)
+    o->ptr = sh+1;                      //zw shå†…å­˜åé¢çš„åœ°å€ï¼Œä¹Ÿå°±æ˜¯å¯¹åº”sdshdrä¸­çš„buf(struct sdshdr { unsigned int len; unsigned int free; char buf[];};)
     o->refcount = 1;
     o->lru = LRU_CLOCK();
 
@@ -88,9 +88,9 @@ robj *createEmbeddedStringObject(char *ptr, size_t len) {
  * The current limit of 39 is chosen so that the biggest string object
  * we allocate as EMBSTR will still fit into the 64 byte arena of jemalloc. */
 /* zw 
-jemalloc»á·ÖÅä8£¬16£¬32£¬64µÈ×Ö½ÚµÄÄÚ´æ
-robj ×îĞ¡Îª£º sizeof(robj) + sizeof(sdshdr) + 1('\0') = 16 + 8 + 1 = 25ËùÒÔ×îĞ¡·ÖÅä64×Ö½Ú
-µ±<=39Ê±ºò¶¼»á·ÖÅä64×Ö½Ú 25+39=64
+jemallocä¼šåˆ†é…8ï¼Œ16ï¼Œ32ï¼Œ64ç­‰å­—èŠ‚çš„å†…å­˜
+robj æœ€å°ä¸ºï¼š sizeof(robj) + sizeof(sdshdr) + 1('\0') = 16 + 8 + 1 = 25æ‰€ä»¥æœ€å°åˆ†é…64å­—èŠ‚
+å½“<=39æ—¶å€™éƒ½ä¼šåˆ†é…64å­—èŠ‚ 25+39=64
 */
 #define REDIS_ENCODING_EMBSTR_SIZE_LIMIT 39
 robj *createStringObject(char *ptr, size_t len) {
@@ -100,15 +100,15 @@ robj *createStringObject(char *ptr, size_t len) {
         return createRawStringObject(ptr,len);
 }
 
-//zw ¸ù¾İÕûĞÎ´´½¨robj
+//zw æ ¹æ®æ•´å½¢åˆ›å»ºrobj
 robj *createStringObjectFromLongLong(long long value) {
     robj *o;
-    //zw Èç¹ûÔÚ¹²ÏíÕûÊıÀïÃæÓĞ£¬Ö±½ÓÓÃ¹²ÏíµÄ
+    //zw å¦‚æœåœ¨å…±äº«æ•´æ•°é‡Œé¢æœ‰ï¼Œç›´æ¥ç”¨å…±äº«çš„
     if (value >= 0 && value < REDIS_SHARED_INTEGERS) {
         incrRefCount(shared.integers[value]);
         o = shared.integers[value];
     } else {
-        //zw Èç¹ûÄÜÓÃlong±íÊ¾£¬¾ÍÖ±½ÓÓÃvoid*ptrÀ´´æÊıÖµ
+        //zw å¦‚æœèƒ½ç”¨longè¡¨ç¤ºï¼Œå°±ç›´æ¥ç”¨void*ptræ¥å­˜æ•°å€¼
         if (value >= LONG_MIN && value <= LONG_MAX) {
             o = createObject(REDIS_STRING, NULL);
             o->encoding = REDIS_ENCODING_INT;
@@ -126,12 +126,12 @@ robj *createStringObjectFromLongLong(long long value) {
  * and the output of snprintf() is not modified.
  *
  * The 'humanfriendly' option is used for INCRBYFLOAT and HINCRBYFLOAT. */
-//zw ¸ù¾İlong double´´½¨robj£¬humanfriendly·ÇÁã£¬²»ÓÃÖ¸ÊıĞÎÊ½²¢Ïû³ıÎ²²¿µÄ0ºÍ.(Èç¹ûÃ»ÓĞĞ¡Êı²¿·Ö)£¬·ñÔòÓÃÖ¸ÊıĞÎÊ½
+//zw æ ¹æ®long doubleåˆ›å»ºrobjï¼Œhumanfriendlyéé›¶ï¼Œä¸ç”¨æŒ‡æ•°å½¢å¼å¹¶æ¶ˆé™¤å°¾éƒ¨çš„0å’Œ.(å¦‚æœæ²¡æœ‰å°æ•°éƒ¨åˆ†)ï¼Œå¦åˆ™ç”¨æŒ‡æ•°å½¢å¼
 robj *createStringObjectFromLongDouble(long double value, int humanfriendly) {
     char buf[256];
     int len;
     
-    //zw Èç¹ûÊÇinf
+    //zw å¦‚æœæ˜¯inf
     if (isinf(value)) {
         /* Libc in odd systems (Hi Solaris!) will format infinite in a
          * different way, so better to handle it in an explicit way. */
@@ -172,8 +172,8 @@ robj *createStringObjectFromLongDouble(long double value, int humanfriendly) {
  * will always result in a fresh object that is unshared (refcount == 1).
  *
  * The resulting object always has refcount set to 1. */
-//zw robj REDIS_STRINGÀàĞÍ¸´ÖÆº¯Êı£¬Ö§³ÖREDIS_ENCODING_RAW£¬REDIS_ENCODING_EMBSTR£¬REDIS_ENCODING_INT
-//zw ·µ»ØĞÂµÄrobj£¬ÒıÓÃ¼ÆÊıÎª1
+//zw robj REDIS_STRINGç±»å‹å¤åˆ¶å‡½æ•°ï¼Œæ”¯æŒREDIS_ENCODING_RAWï¼ŒREDIS_ENCODING_EMBSTRï¼ŒREDIS_ENCODING_INT
+//zw è¿”å›æ–°çš„robjï¼Œå¼•ç”¨è®¡æ•°ä¸º1
 robj *dupStringObject(robj *o) {
     robj *d;
 
@@ -194,7 +194,7 @@ robj *dupStringObject(robj *o) {
         break;
     }
 }
-//zw ´´½¨list robj
+//zw åˆ›å»ºlist robj
 robj *createListObject(void) {
     list *l = listCreate();
     robj *o = createObject(REDIS_LIST,l);
@@ -203,35 +203,35 @@ robj *createListObject(void) {
     return o;
 }
 
-//zw ´´½¨ziplist robj
+//zw åˆ›å»ºziplist robj
 robj *createZiplistObject(void) {
     unsigned char *zl = ziplistNew();
     robj *o = createObject(REDIS_LIST,zl);
     o->encoding = REDIS_ENCODING_ZIPLIST;
     return o;
 }
-//zw ´´½¨set robj
+//zw åˆ›å»ºset robj
 robj *createSetObject(void) {
     dict *d = dictCreate(&setDictType,NULL);
     robj *o = createObject(REDIS_SET,d);
     o->encoding = REDIS_ENCODING_HT;
     return o;
 }
-//zw ´´½¨intset robj
+//zw åˆ›å»ºintset robj
 robj *createIntsetObject(void) {
     intset *is = intsetNew();
     robj *o = createObject(REDIS_SET,is);
     o->encoding = REDIS_ENCODING_INTSET;
     return o;
 }
-//zw ´´½¨hash robj
+//zw åˆ›å»ºhash robj
 robj *createHashObject(void) {
     unsigned char *zl = ziplistNew();
     robj *o = createObject(REDIS_HASH, zl);
     o->encoding = REDIS_ENCODING_ZIPLIST;
     return o;
 }
-//zw ´´½¨zset robj£¬ µ×²¿ÊµÏÖÓÃskiplist
+//zw åˆ›å»ºzset robjï¼Œ åº•éƒ¨å®ç°ç”¨skiplist
 robj *createZsetObject(void) {
     zset *zs = zmalloc(sizeof(*zs));
     robj *o;
@@ -242,20 +242,20 @@ robj *createZsetObject(void) {
     o->encoding = REDIS_ENCODING_SKIPLIST;
     return o;
 }
-//zw ´´½¨zset robj£¬ µ×²¿ÊµÏÖÓÃziplist
+//zw åˆ›å»ºzset robjï¼Œ åº•éƒ¨å®ç°ç”¨ziplist
 robj *createZsetZiplistObject(void) {
     unsigned char *zl = ziplistNew();
     robj *o = createObject(REDIS_ZSET,zl);
     o->encoding = REDIS_ENCODING_ZIPLIST;
     return o;
 }
-//zw ÊÍ·Åstring£¬Ö»ÊÍ·ÅrobµÄptrÄÚ´æ£¬ ÁíÍâµÄÀàĞÍÓÉÓÚÊÇÓÃµÄÄÚ´æºÍrobjÍ·²¿ÔÚÒ»Æğ£¬ÕâÀï²»ÊÍ·Å
+//zw é‡Šæ”¾stringï¼Œåªé‡Šæ”¾robçš„ptrå†…å­˜ï¼Œ å¦å¤–çš„ç±»å‹ç”±äºæ˜¯ç”¨çš„å†…å­˜å’Œrobjå¤´éƒ¨åœ¨ä¸€èµ·ï¼Œè¿™é‡Œä¸é‡Šæ”¾
 void freeStringObject(robj *o) {
     if (o->encoding == REDIS_ENCODING_RAW) {
         sdsfree(o->ptr);
     }
 }
-//zw ÊÍ·Ålist
+//zw é‡Šæ”¾list
 void freeListObject(robj *o) {
     switch (o->encoding) {
     case REDIS_ENCODING_LINKEDLIST:
@@ -312,11 +312,11 @@ void freeHashObject(robj *o) {
         break;
     }
 }
-//zw ÒıÓÃ¼ÆÊı+1
+//zw å¼•ç”¨è®¡æ•°+1
 void incrRefCount(robj *o) {
     o->refcount++;
 }
-//zw ÒıÓÃ¼ÆÊı-1£¬Èç¹ûÒıÓÃ¼ÆÊı<=0£¬Ôò³ö´íÁË£¬Èç¹û´óÓÚ1£¬ÒıÓÃ¼ÆÊı-1£¬Èç¹û=1£¬ÔòÊÍ·ÅrobjÄÚ´æ
+//zw å¼•ç”¨è®¡æ•°-1ï¼Œå¦‚æœå¼•ç”¨è®¡æ•°<=0ï¼Œåˆ™å‡ºé”™äº†ï¼Œå¦‚æœå¤§äº1ï¼Œå¼•ç”¨è®¡æ•°-1ï¼Œå¦‚æœ=1ï¼Œåˆ™é‡Šæ”¾robjå†…å­˜
 void decrRefCount(robj *o) {
     if (o->refcount <= 0) redisPanic("decrRefCount against refcount <= 0");
     if (o->refcount == 1) {
@@ -337,7 +337,7 @@ void decrRefCount(robj *o) {
 /* This variant of decrRefCount() gets its argument as void, and is useful
  * as free method in data structures that expect a 'void free_object(void*)'
  * prototype for the free method. */
-//zw ÓĞĞ©ÊÍ·Å·½·¨£¬ĞèÒªÓÃ void free_object(void*) µÄÊÍ·Åº¯Êı
+//zw æœ‰äº›é‡Šæ”¾æ–¹æ³•ï¼Œéœ€è¦ç”¨ void free_object(void*) çš„é‡Šæ”¾å‡½æ•°
 void decrRefCountVoid(void *o) {
     decrRefCount(o);
 }
@@ -354,12 +354,12 @@ void decrRefCountVoid(void *o) {
  *    functionThatWillIncrementRefCount(obj);
  *    decrRefCount(obj);
  */
-//zw ÖØÉèÒıÓÃ¼ÆÊı 
+//zw é‡è®¾å¼•ç”¨è®¡æ•° 
 robj *resetRefCount(robj *obj) {
     obj->refcount = 0;
     return obj;
 }
-//zw ¼ì²ârobjÀàĞÍ
+//zw æ£€æµ‹robjç±»å‹
 int checkType(redisClient *c, robj *o, int type) {
     if (o->type != type) {
         addReply(c,shared.wrongtypeerr);
@@ -367,7 +367,7 @@ int checkType(redisClient *c, robj *o, int type) {
     }
     return 0;
 }
-//zw robjÊÇ·ñÄÜ±íÊ¾Îªlong longÀàĞÍ
+//zw robjæ˜¯å¦èƒ½è¡¨ç¤ºä¸ºlong longç±»å‹
 int isObjectRepresentableAsLongLong(robj *o, long long *llval) {
     redisAssertWithInfo(NULL,o,o->type == REDIS_STRING);
     if (o->encoding == REDIS_ENCODING_INT) {
@@ -379,7 +379,7 @@ int isObjectRepresentableAsLongLong(robj *o, long long *llval) {
 }
 
 /* Try to encode a string object in order to save space */
-//zw ³¢ÊÔ½«string objectÖØĞÂ±àÂë£¬½ÚÔ¼¿Õ¼ä
+//zw å°è¯•å°†string objecté‡æ–°ç¼–ç ï¼ŒèŠ‚çº¦ç©ºé—´
 robj *tryObjectEncoding(robj *o) {
     long value;
     sds s = o->ptr;
@@ -394,26 +394,26 @@ robj *tryObjectEncoding(robj *o) {
     /* We try some specialized encoding only for objects that are
      * RAW or EMBSTR encoded, in other words objects that are still
      * in represented by an actually array of chars. */
-    //zw Ö»³¢ÊÔ´¦ÀíRAW or EMBSTR encoded
+    //zw åªå°è¯•å¤„ç†RAW or EMBSTR encoded
     if (!sdsEncodedObject(o)) return o;
 
     /* It's not safe to encode shared objects: shared objects can be shared
      * everywhere in the "object space" of Redis and may end in places where
      * they are not handled. We handle them only as values in the keyspace. */
-     //zw Èç¹ûÒıÓÃ¼ÆÊı>1¾Í²»´¦Àí
+     //zw å¦‚æœå¼•ç”¨è®¡æ•°>1å°±ä¸å¤„ç†
      if (o->refcount > 1) return o;
 
     /* Check if we can represent this string as a long integer.
      * Note that we are sure that a string larger than 21 chars is not
      * representable as a 32 nor 64 bit integer. */
     len = sdslen(s);
-    //zw Èç¹û×Ö·û´®ÄÜ×ªÎªlong
+    //zw å¦‚æœå­—ç¬¦ä¸²èƒ½è½¬ä¸ºlong
     if (len <= 21 && string2l(s,len,&value)) {
         /* This object is encodable as a long. Try to use a shared object.
          * Note that we avoid using shared integers when maxmemory is used
          * because every object needs to have a private LRU field for the LRU
          * algorithm to work well. */
-        //zw ³¢ÊÔÓÃ¹²ÏíµÄintÀ´´æ·Å£¬µ±ĞèÒªÊ¹ÓÃlruËã·¨ÓÅ»¯³ÌĞòµÄÊ±ºò²»Ê¹ÓÃ¹²ÏíµÄ 
+        //zw å°è¯•ç”¨å…±äº«çš„intæ¥å­˜æ”¾ï¼Œå½“éœ€è¦ä½¿ç”¨lruç®—æ³•ä¼˜åŒ–ç¨‹åºçš„æ—¶å€™ä¸ä½¿ç”¨å…±äº«çš„ 
         if ((server.maxmemory == 0 ||
              (server.maxmemory_policy != REDIS_MAXMEMORY_VOLATILE_LRU &&
               server.maxmemory_policy != REDIS_MAXMEMORY_ALLKEYS_LRU)) &&
@@ -423,7 +423,7 @@ robj *tryObjectEncoding(robj *o) {
             decrRefCount(o);
             incrRefCount(shared.integers[value]);
             return shared.integers[value];
-        } else {//zw Ö±½ÓÓÃptrµÄÄÚ´æÀ´´æÊıÖµ
+        } else {//zw ç›´æ¥ç”¨ptrçš„å†…å­˜æ¥å­˜æ•°å€¼
             if (o->encoding == REDIS_ENCODING_RAW) sdsfree(o->ptr);
             o->encoding = REDIS_ENCODING_INT;
             o->ptr = (void*) value;
@@ -435,7 +435,7 @@ robj *tryObjectEncoding(robj *o) {
      * try the EMBSTR encoding which is more efficient.
      * In this representation the object and the SDS string are allocated
      * in the same chunk of memory to save space and cache misses. */
-    //zw Èç¹û¿ÉÒÔÓÃEMBSTR±àÂë
+    //zw å¦‚æœå¯ä»¥ç”¨EMBSTRç¼–ç 
     if (len <= REDIS_ENCODING_EMBSTR_SIZE_LIMIT) {
         robj *emb;
 
@@ -454,7 +454,7 @@ robj *tryObjectEncoding(robj *o) {
      * We do that only for relatively large strings as this branch
      * is only entered if the length of the string is greater than
      * REDIS_ENCODING_EMBSTR_SIZE_LIMIT. */
-    //zw Èç¹ûÊÇRAW±àÂë¡£ ²¢ÇÒfree¿Õ¼ä>len/10£¬¾ÍÒÆ³ı¿ÉÓÃ¿Õ¼ä£¬Ê¹ÄÚ´æ¸ÕºÃ¿ÉÒÔ´æÏÂ×Ö·û´®
+    //zw å¦‚æœæ˜¯RAWç¼–ç ã€‚ å¹¶ä¸”freeç©ºé—´>len/10ï¼Œå°±ç§»é™¤å¯ç”¨ç©ºé—´ï¼Œä½¿å†…å­˜åˆšå¥½å¯ä»¥å­˜ä¸‹å­—ç¬¦ä¸²
     if (o->encoding == REDIS_ENCODING_RAW &&
         sdsavail(s) > len/10)
     {
@@ -467,7 +467,7 @@ robj *tryObjectEncoding(robj *o) {
 
 /* Get a decoded version of an encoded object (returned as a new object).
  * If the object is already raw-encoded just increment the ref count. */
-//zw ½âÂërobj£¬·µ»Ørobj Èç¹ûRAW»òEMBSTR,Ö±½ÓÒıÓÃ¼ÆÊı+1²¢·µ»Ø£¬Èç¹ûÊÇINT·µ»ØĞÂµÄstring object
+//zw è§£ç robjï¼Œè¿”å›robj å¦‚æœRAWæˆ–EMBSTR,ç›´æ¥å¼•ç”¨è®¡æ•°+1å¹¶è¿”å›ï¼Œå¦‚æœæ˜¯INTè¿”å›æ–°çš„string object
 robj *getDecodedObject(robj *o) {
     robj *dec;
     
@@ -494,7 +494,7 @@ robj *getDecodedObject(robj *o) {
  *
  * Important note: when REDIS_COMPARE_BINARY is used a binary-safe comparison
  * is used. */
-//zw Í¨¹ı memcmp() »ò strcoll() À´±È½ÏÁ½¸ö×Ö·û´®
+//zw é€šè¿‡ memcmp() æˆ– strcoll() æ¥æ¯”è¾ƒä¸¤ä¸ªå­—ç¬¦ä¸²
 #define REDIS_COMPARE_BINARY (1<<0)
 #define REDIS_COMPARE_COLL (1<<1)
 
@@ -546,7 +546,7 @@ int collateStringObjects(robj *a, robj *b) {
  * point of view of a string comparison, otherwise 0 is returned. Note that
  * this function is faster then checking for (compareStringObject(a,b) == 0)
  * because it can perform some more optimization. */
-//zw ÅĞ¶ÏÁ½¸ö×Ö·û´®robjÊÇ·ñÏàµÈ
+//zw åˆ¤æ–­ä¸¤ä¸ªå­—ç¬¦ä¸²robjæ˜¯å¦ç›¸ç­‰
 int equalStringObjects(robj *a, robj *b) {
     if (a->encoding == REDIS_ENCODING_INT &&
         b->encoding == REDIS_ENCODING_INT){
@@ -558,7 +558,7 @@ int equalStringObjects(robj *a, robj *b) {
     }
 }
 
-//zw »ñÈ¡×Ö·û´®robj³¤¶È
+//zw è·å–å­—ç¬¦ä¸²robjé•¿åº¦
 size_t stringObjectLen(robj *o) {
     redisAssertWithInfo(NULL,o,o->type == REDIS_STRING);
     if (sdsEncodedObject(o)) {
@@ -569,7 +569,7 @@ size_t stringObjectLen(robj *o) {
         return ll2string(buf,32,(long)o->ptr);
     }
 }
-//zw ¸ù¾İ×Ö·û´®robj×ªdouble
+//zw æ ¹æ®å­—ç¬¦ä¸²robjè½¬double
 int getDoubleFromObject(robj *o, double *target) {
     double value;
     char *eptr;
@@ -597,7 +597,7 @@ int getDoubleFromObject(robj *o, double *target) {
     *target = value;
     return REDIS_OK;
 }
-//zw ¸ù¾İ×Ö·û´®robj×ªdouble£¬Èç¹ûÊ§°Ü·¢ËÍÏûÏ¢¸øredisClient
+//zw æ ¹æ®å­—ç¬¦ä¸²robjè½¬doubleï¼Œå¦‚æœå¤±è´¥å‘é€æ¶ˆæ¯ç»™redisClient
 int getDoubleFromObjectOrReply(redisClient *c, robj *o, double *target, const char *msg) {
     double value;
     if (getDoubleFromObject(o, &value) != REDIS_OK) {
@@ -704,7 +704,7 @@ int getLongFromObjectOrReply(redisClient *c, robj *o, long *target, const char *
     return REDIS_OK;
 }
 
-//zw ¸ù¾İencoding£¬ ·µ»Ø¶ÔÓ¦µÄ×Ö·û´®
+//zw æ ¹æ®encodingï¼Œ è¿”å›å¯¹åº”çš„å­—ç¬¦ä¸²
 char *strEncoding(int encoding) {
     switch(encoding) {
     case REDIS_ENCODING_RAW: return "raw";
@@ -721,7 +721,7 @@ char *strEncoding(int encoding) {
 
 /* Given an object returns the min number of milliseconds the object was never
  * requested, using an approximated LRU algorithm. */
-//zw ·µ»Ørobj¶à¾Ã£¨ºÁÃë£©Ã»ÓĞÇëÇó¹ı£¬²ÉÓÃ½üËÆLRUËã·¨
+//zw è¿”å›robjå¤šä¹…ï¼ˆæ¯«ç§’ï¼‰æ²¡æœ‰è¯·æ±‚è¿‡ï¼Œé‡‡ç”¨è¿‘ä¼¼LRUç®—æ³•
 unsigned long long estimateObjectIdleTime(robj *o) {
     unsigned long long lruclock = LRU_CLOCK();
     if (lruclock >= o->lru) {
@@ -734,14 +734,14 @@ unsigned long long estimateObjectIdleTime(robj *o) {
 
 /* This is a helper function for the OBJECT command. We need to lookup keys
  * without any modification of LRU or other parameters. */
-//zw object ÃüÁî
+//zw object å‘½ä»¤
 robj *objectCommandLookup(redisClient *c, robj *key) {
     dictEntry *de;
 
     if ((de = dictFind(c->db->dict,key->ptr)) == NULL) return NULL;
     return (robj*) dictGetVal(de);
 }
-//zw object ÃüÁî£¬µ±Ã»ÓĞÕÒµ½ ¸øredisClient ·¢reply
+//zw object å‘½ä»¤ï¼Œå½“æ²¡æœ‰æ‰¾åˆ° ç»™redisClient å‘reply
 robj *objectCommandLookupOrReply(redisClient *c, robj *key, robj *reply) {
     robj *o = objectCommandLookup(c,key);
 
@@ -751,7 +751,7 @@ robj *objectCommandLookupOrReply(redisClient *c, robj *key, robj *reply) {
 
 /* Object command allows to inspect the internals of an Redis Object.
  * Usage: OBJECT <refcount|encoding|idletime> <key> */
-//zw object ÃüÁî
+//zw object å‘½ä»¤
 void objectCommand(redisClient *c) {
     robj *o;
 

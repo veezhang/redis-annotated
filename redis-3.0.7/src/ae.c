@@ -44,7 +44,7 @@
 #include "zmalloc.h"
 #include "config.h"
 
-//zw ÕÒµ½×îºÏÊÊµÄIO¸´ÓÃ
+//zw æ‰¾åˆ°æœ€åˆé€‚çš„IOå¤ç”¨
 /* Include the best multiplexing layer supported by this system.
  * The following should be ordered by performances, descending. */
 #ifdef HAVE_EVPORT
@@ -61,17 +61,17 @@
     #endif
 #endif
 
-//zw ´´½¨ÊÂ¼şÑ­»·£¬setsizeÎª×î´óÊÂ¼şµÄµÄ¸öÊı£¬¶ÔÓÚepollÀ´ËµÒ²ÊÇepoll_eventµÄ¸öÊı
+//zw åˆ›å»ºäº‹ä»¶å¾ªç¯ï¼Œsetsizeä¸ºæœ€å¤§äº‹ä»¶çš„çš„ä¸ªæ•°ï¼Œå¯¹äºepollæ¥è¯´ä¹Ÿæ˜¯epoll_eventçš„ä¸ªæ•°
 aeEventLoop *aeCreateEventLoop(int setsize) {
     aeEventLoop *eventLoop;
     int i;
     
-    //zw ·ÖÅäÄÚ´æ
+    //zw åˆ†é…å†…å­˜
     if ((eventLoop = zmalloc(sizeof(*eventLoop))) == NULL) goto err;
     eventLoop->events = zmalloc(sizeof(aeFileEvent)*setsize);
     eventLoop->fired = zmalloc(sizeof(aeFiredEvent)*setsize);
     if (eventLoop->events == NULL || eventLoop->fired == NULL) goto err;
-    //zw ³õÊ¼»¯
+    //zw åˆå§‹åŒ–
     eventLoop->setsize = setsize;
     eventLoop->lastTime = time(NULL);
     eventLoop->timeEventHead = NULL;
@@ -80,7 +80,7 @@ aeEventLoop *aeCreateEventLoop(int setsize) {
     eventLoop->maxfd = -1;
     eventLoop->beforesleep = NULL;
     
-    //zw ÕâÒ»²½Îª´´½¨µ×²ãIO´¦ÀíµÄÊı¾İ£¬Èçepoll£¬´´½¨epoll_event,ºÍepfd
+    //zw è¿™ä¸€æ­¥ä¸ºåˆ›å»ºåº•å±‚IOå¤„ç†çš„æ•°æ®ï¼Œå¦‚epollï¼Œåˆ›å»ºepoll_event,å’Œepfd
     if (aeApiCreate(eventLoop) == -1) goto err;
     /* Events with mask == AE_NONE are not set. So let's initialize the
      * vector with it. */
@@ -89,7 +89,7 @@ aeEventLoop *aeCreateEventLoop(int setsize) {
     return eventLoop;
 
 err:
-    //zw ´íÎóÊÍ·ÅÄÚ´æ
+    //zw é”™è¯¯é‡Šæ”¾å†…å­˜
     if (eventLoop) {
         zfree(eventLoop->events);
         zfree(eventLoop->fired);
@@ -110,7 +110,7 @@ int aeGetSetSize(aeEventLoop *eventLoop) {
  * performed at all.
  *
  * Otherwise AE_OK is returned and the operation is successful. */
-//zw ÖØÉè¼àÌıÊı ÖØĞÂ·ÖÅäÄÚ´æ
+//zw é‡è®¾ç›‘å¬æ•° é‡æ–°åˆ†é…å†…å­˜
 int aeResizeSetSize(aeEventLoop *eventLoop, int setsize) {
     int i;
 
@@ -129,7 +129,7 @@ int aeResizeSetSize(aeEventLoop *eventLoop, int setsize) {
     return AE_OK;
 }
 
-//zw É¾³ıÊÂ¼şÑ­»· »ØÊÕÄÚ´æ
+//zw åˆ é™¤äº‹ä»¶å¾ªç¯ å›æ”¶å†…å­˜
 void aeDeleteEventLoop(aeEventLoop *eventLoop) {
     aeApiFree(eventLoop);
     zfree(eventLoop->events);
@@ -137,26 +137,26 @@ void aeDeleteEventLoop(aeEventLoop *eventLoop) {
     zfree(eventLoop);
 }
 
-//zw Í£Ö¹ÊÂ¼şÑ­»·
+//zw åœæ­¢äº‹ä»¶å¾ªç¯
 void aeStop(aeEventLoop *eventLoop) {
     eventLoop->stop = 1;
 }
 
-//zw ´´½¨ÎÄ¼şÊÂ¼ş£¬²¢½«¸ÃÊÂ¼ş×¢²áµ½eventLoopÖĞ
+//zw åˆ›å»ºæ–‡ä»¶äº‹ä»¶ï¼Œå¹¶å°†è¯¥äº‹ä»¶æ³¨å†Œåˆ°eventLoopä¸­
 int aeCreateFileEvent(aeEventLoop *eventLoop, int fd, int mask,
         aeFileProc *proc, void *clientData)
 {
-    //zw ³¬³ö·¶Î§
+    //zw è¶…å‡ºèŒƒå›´
     if (fd >= eventLoop->setsize) {1
         errno = ERANGE;
         return AE_ERR;
     }
     aeFileEvent *fe = &eventLoop->events[fd];
     
-    //zw Ìí¼Óµ½EventLoop
+    //zw æ·»åŠ åˆ°EventLoop
     if (aeApiAddEvent(eventLoop, fd, mask) == -1)
         return AE_ERR;
-    //zw ÕâÀïÓÃ »ò ÔËËã·û
+    //zw è¿™é‡Œç”¨ æˆ– è¿ç®—ç¬¦
     fe->mask |= mask;
     if (mask & AE_READABLE) fe->rfileProc = proc;
     if (mask & AE_WRITABLE) fe->wfileProc = proc;
@@ -166,7 +166,7 @@ int aeCreateFileEvent(aeEventLoop *eventLoop, int fd, int mask,
     return AE_OK;
 }
 
-//zw É¾³ıÎÄ¼şÊÂ¼ş
+//zw åˆ é™¤æ–‡ä»¶äº‹ä»¶
 void aeDeleteFileEvent(aeEventLoop *eventLoop, int fd, int mask)
 {
     if (fd >= eventLoop->setsize) return;
@@ -174,9 +174,9 @@ void aeDeleteFileEvent(aeEventLoop *eventLoop, int fd, int mask)
     if (fe->mask == AE_NONE) return;
 
     aeApiDelEvent(eventLoop, fd, mask);
-    //zw ¶Ô ·´ ×ö Óë ²Ù×÷
+    //zw å¯¹ å åš ä¸ æ“ä½œ
     fe->mask = fe->mask & (~mask);
-    //zw ¸üĞÂmaxfd
+    //zw æ›´æ–°maxfd
     if (fd == eventLoop->maxfd && fe->mask == AE_NONE) {
         /* Update the max fd */
         int j;
@@ -187,7 +187,7 @@ void aeDeleteFileEvent(aeEventLoop *eventLoop, int fd, int mask)
     }
 }
 
-//zw »ñÈ¡ÎÄ¼şÊÂ¼şmask
+//zw è·å–æ–‡ä»¶äº‹ä»¶mask
 int aeGetFileEvents(aeEventLoop *eventLoop, int fd) {
     if (fd >= eventLoop->setsize) return 0;
     aeFileEvent *fe = &eventLoop->events[fd];
@@ -195,7 +195,7 @@ int aeGetFileEvents(aeEventLoop *eventLoop, int fd) {
     return fe->mask;
 }
 
-//zw »ñÈ¡µ±Ç°Ê±¼ä
+//zw è·å–å½“å‰æ—¶é—´
 static void aeGetTime(long *seconds, long *milliseconds)
 {
     struct timeval tv;
@@ -205,7 +205,7 @@ static void aeGetTime(long *seconds, long *milliseconds)
     *milliseconds = tv.tv_usec/1000;
 }
 
-//zw »ñµÃµ±Ç°Ê±¼äºó¶àÉÙÎ¢Ãë
+//zw è·å¾—å½“å‰æ—¶é—´åå¤šå°‘å¾®ç§’
 static void aeAddMillisecondsToNow(long long milliseconds, long *sec, long *ms) {
     long cur_sec, cur_ms, when_sec, when_ms;
 
@@ -220,7 +220,7 @@ static void aeAddMillisecondsToNow(long long milliseconds, long *sec, long *ms) 
     *ms = when_ms;
 }
 
-//zw ´´½¨Ê±¼äÊÂ¼ş Á´±í±£´æ£¬Í·²å·¨
+//zw åˆ›å»ºæ—¶é—´äº‹ä»¶ é“¾è¡¨ä¿å­˜ï¼Œå¤´æ’æ³•
 long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,
         aeTimeProc *proc, void *clientData,
         aeEventFinalizerProc *finalizerProc)
@@ -240,7 +240,7 @@ long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,
     return id;
 }
 
-//zw É¾³ıÊ±¼äÊÂ¼ş
+//zw åˆ é™¤æ—¶é—´äº‹ä»¶
 int aeDeleteTimeEvent(aeEventLoop *eventLoop, long long id)
 {
     aeTimeEvent *te, *prev = NULL;
@@ -252,7 +252,7 @@ int aeDeleteTimeEvent(aeEventLoop *eventLoop, long long id)
                 eventLoop->timeEventHead = te->next;
             else
                 prev->next = te->next;
-            //zw É¾³ı´¦Àíº¯Êı
+            //zw åˆ é™¤å¤„ç†å‡½æ•°
             if (te->finalizerProc)
                 te->finalizerProc(eventLoop, te->clientData);
             zfree(te);
@@ -275,7 +275,7 @@ int aeDeleteTimeEvent(aeEventLoop *eventLoop, long long id)
  *    Much better but still insertion or deletion of timers is O(N).
  * 2) Use a skiplist to have this operation as O(1) and insertion as O(log(N)).
  */
-//zw ²éÕÒÊ±¼ä×îĞ¡µÄÊ±¼äÊÂ¼ş
+//zw æŸ¥æ‰¾æ—¶é—´æœ€å°çš„æ—¶é—´äº‹ä»¶
 static aeTimeEvent *aeSearchNearestTimer(aeEventLoop *eventLoop)
 {
     aeTimeEvent *te = eventLoop->timeEventHead;
@@ -291,7 +291,7 @@ static aeTimeEvent *aeSearchNearestTimer(aeEventLoop *eventLoop)
     return nearest;
 }
 
-//zw Ê±¼äÊÂ¼ş´¦Àíº¯Êı
+//zw æ—¶é—´äº‹ä»¶å¤„ç†å‡½æ•°
 /* Process time events */
 static int processTimeEvents(aeEventLoop *eventLoop) {
     int processed = 0;
@@ -307,8 +307,8 @@ static int processTimeEvents(aeEventLoop *eventLoop) {
      * events to be processed ASAP when this happens: the idea is that
      * processing events earlier is less dangerous than delaying them
      * indefinitely, and practice suggests it is. */
-    //zw Ê×ÏÈ»áĞ£ÑéÊÇ·ñ·¢ÉúÏµÍ³Ê±ÖÓÆ«²î£¨system clock skew£¬°ÑÊÂ¼şµ÷µ½¹ıÈ¥£©
-    //zw Èç¹û·¢Éú¾Í½«ËùÓĞÊÂ¼şµÄ·¢ÉúÊ±¼äÖÃÎª0£¬Á¢¼´´¥·¢
+    //zw é¦–å…ˆä¼šæ ¡éªŒæ˜¯å¦å‘ç”Ÿç³»ç»Ÿæ—¶é’Ÿåå·®ï¼ˆsystem clock skewï¼ŒæŠŠäº‹ä»¶è°ƒåˆ°è¿‡å»ï¼‰
+    //zw å¦‚æœå‘ç”Ÿå°±å°†æ‰€æœ‰äº‹ä»¶çš„å‘ç”Ÿæ—¶é—´ç½®ä¸º0ï¼Œç«‹å³è§¦å‘
     if (now < eventLoop->lastTime) {
         te = eventLoop->timeEventHead;
         while(te) {
@@ -318,7 +318,7 @@ static int processTimeEvents(aeEventLoop *eventLoop) {
     }
     eventLoop->lastTime = now;
     
-    //zw ±éÀúËùÓĞÊ±¼äÊÂ¼ş
+    //zw éå†æ‰€æœ‰æ—¶é—´äº‹ä»¶
     te = eventLoop->timeEventHead;
     maxId = eventLoop->timeEventNextId-1;
     while(te) {
@@ -330,7 +330,7 @@ static int processTimeEvents(aeEventLoop *eventLoop) {
             continue;
         }
         aeGetTime(&now_sec, &now_ms);
-        //zw Ê±¼äµ½ÁË
+        //zw æ—¶é—´åˆ°äº†
         if (now_sec > te->when_sec ||
             (now_sec == te->when_sec && now_ms >= te->when_ms))
         {
@@ -378,30 +378,30 @@ static int processTimeEvents(aeEventLoop *eventLoop) {
  * the events that's possible to process without to wait are processed.
  *
  * The function returns the number of events processed. */
-//zw ´¦ÀíÊÂ¼ş£¬·µ»Ø´¦ÀíÊÂ¼şµÄ¸öÊı
+//zw å¤„ç†äº‹ä»¶ï¼Œè¿”å›å¤„ç†äº‹ä»¶çš„ä¸ªæ•°
 int aeProcessEvents(aeEventLoop *eventLoop, int flags)
 {
     int processed = 0, numevents;
 
     /* Nothing to do? return ASAP */
-    //zw Èç¹û²»¹Ø×¢ Ê±¼äÊÂ¼ş ºÍ ÎÄ¼şÊÂ¼ş£¬ ¾¡¿ì·µ»Ø
+    //zw å¦‚æœä¸å…³æ³¨ æ—¶é—´äº‹ä»¶ å’Œ æ–‡ä»¶äº‹ä»¶ï¼Œ å°½å¿«è¿”å›
     if (!(flags & AE_TIME_EVENTS) && !(flags & AE_FILE_EVENTS)) return 0;
 
     /* Note that we want call select() even if there are no
      * file events to process as long as we want to process time
      * events, in order to sleep until the next time event is ready
      * to fire. */
-    //zw Èç¹ûÓĞÎÄ¼şÊÂ¼ş£¬»ò ¹Ø×¢Ê±¼äÊÂ¼ş²¢ÇÒÃ»ÓĞÉèÖÃAE_DONT_WAIT±êÖ¾£¨¼´poll²»Á¢¼´·µ»Ø£¬ĞèÒª³¬Ê±poll£©
+    //zw å¦‚æœæœ‰æ–‡ä»¶äº‹ä»¶ï¼Œæˆ– å…³æ³¨æ—¶é—´äº‹ä»¶å¹¶ä¸”æ²¡æœ‰è®¾ç½®AE_DONT_WAITæ ‡å¿—ï¼ˆå³pollä¸ç«‹å³è¿”å›ï¼Œéœ€è¦è¶…æ—¶pollï¼‰
     if (eventLoop->maxfd != -1 ||
         ((flags & AE_TIME_EVENTS) && !(flags & AE_DONT_WAIT))) {
         int j;
         aeTimeEvent *shortest = NULL;
         struct timeval tv, *tvp;
         
-        //zw ÕÒÒ»¸öÊ±¼ä×îĞ¡µÄ£¬¹Ø×¢Ê±¼äÊÂ¼ş²¢ÇÒÃ»ÓĞÉèÖÃAE_DONT_WAIT±êÖ¾£¨¼´poll²»Á¢¼´·µ»Ø£¬ĞèÒª³¬Ê±poll£©
+        //zw æ‰¾ä¸€ä¸ªæ—¶é—´æœ€å°çš„ï¼Œå…³æ³¨æ—¶é—´äº‹ä»¶å¹¶ä¸”æ²¡æœ‰è®¾ç½®AE_DONT_WAITæ ‡å¿—ï¼ˆå³pollä¸ç«‹å³è¿”å›ï¼Œéœ€è¦è¶…æ—¶pollï¼‰
         if (flags & AE_TIME_EVENTS && !(flags & AE_DONT_WAIT))
             shortest = aeSearchNearestTimer(eventLoop);
-        if (shortest) { //zw Èç¹ûÕÒµ½ÁË£¬ Óëµ±Ç°Öµ¼ÆËã²îÖµ
+        if (shortest) { //zw å¦‚æœæ‰¾åˆ°äº†ï¼Œ ä¸å½“å‰å€¼è®¡ç®—å·®å€¼
             long now_sec, now_ms;
 
             /* Calculate the time missing for the nearest
@@ -421,11 +421,11 @@ int aeProcessEvents(aeEventLoop *eventLoop, int flags)
             /* If we have to check for events but need to return
              * ASAP because of AE_DONT_WAIT we need to set the timeout
              * to zero */
-            //zw Á¢¼´·µ»Ø
+            //zw ç«‹å³è¿”å›
             if (flags & AE_DONT_WAIT) {
                 tv.tv_sec = tv.tv_usec = 0;
                 tvp = &tv;
-            } else { //zw zÒ»Ö±µÈ´ı£¬ÖªµÀÓĞÊ±¼ä²úÉú
+            } else { //zw zä¸€ç›´ç­‰å¾…ï¼ŒçŸ¥é“æœ‰æ—¶é—´äº§ç”Ÿ
                 /* Otherwise we can block */
                 tvp = NULL; /* wait forever */
             }
@@ -447,8 +447,8 @@ int aeProcessEvents(aeEventLoop *eventLoop, int flags)
                 fe->rfileProc(eventLoop,fd,fe->clientData,mask);
             }
             if (fe->mask & mask & AE_WRITABLE) {
-                //zw Ã»ÓĞ´¦ÀíĞ´¶¯×÷ »ò ¶ÁĞ´ÊÇ²»Í¬µÄº¯Êı
-                //zw ÕâÀïµÄÅĞ¶ÏÊÇÎªÁË·ÀÖ¹ÖØ¸´µ÷ÓÃ
+                //zw æ²¡æœ‰å¤„ç†å†™åŠ¨ä½œ æˆ– è¯»å†™æ˜¯ä¸åŒçš„å‡½æ•°
+                //zw è¿™é‡Œçš„åˆ¤æ–­æ˜¯ä¸ºäº†é˜²æ­¢é‡å¤è°ƒç”¨
                 if (!rfired || fe->wfileProc != fe->rfileProc)
                     fe->wfileProc(eventLoop,fd,fe->clientData,mask);
             }
@@ -456,7 +456,7 @@ int aeProcessEvents(aeEventLoop *eventLoop, int flags)
         }
     }
     /* Check time events */
-    //zw ´¦ÀíÊ±¼äÊÂ¼ş
+    //zw å¤„ç†æ—¶é—´äº‹ä»¶
     if (flags & AE_TIME_EVENTS)
         processed += processTimeEvents(eventLoop);
 
@@ -485,7 +485,7 @@ int aeWait(int fd, int mask, long long milliseconds) {
     }
 }
 
-//zw Ö÷Ñ­»·
+//zw ä¸»å¾ªç¯
 void aeMain(aeEventLoop *eventLoop) {
     eventLoop->stop = 0;
     while (!eventLoop->stop) {
@@ -495,12 +495,12 @@ void aeMain(aeEventLoop *eventLoop) {
     }
 }
 
-//zw »ñÈ¡APIÃû×Ö£¬Èçepoll·µ»Øepoll
+//zw è·å–APIåå­—ï¼Œå¦‚epollè¿”å›epoll
 char *aeGetApiName(void) {
     return aeApiName();
 }
 
-//zw ÉèÖÃbeforesleep´¦Àíº¯Êı
+//zw è®¾ç½®beforesleepå¤„ç†å‡½æ•°
 void aeSetBeforeSleepProc(aeEventLoop *eventLoop, aeBeforeSleepProc *beforesleep) {
     eventLoop->beforesleep = beforesleep;
 }

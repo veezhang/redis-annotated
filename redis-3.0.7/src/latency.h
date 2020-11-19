@@ -33,49 +33,49 @@
 
 #ifndef __LATENCY_H
 #define __LATENCY_H
-//zw latencyÑÓ³Ù·ÖÎö´¦Àí
+//zw latencyå»¶è¿Ÿåˆ†æå¤„ç†
 
-#define LATENCY_TS_LEN 160 /* History length for every monitored event. ¼àÌıÊ±¼äµÄÀúÊ·³¤¶È£¬²ÉÑùµãµÄ¸öÊı */
+#define LATENCY_TS_LEN 160 /* History length for every monitored event. ç›‘å¬æ—¶é—´çš„å†å²é•¿åº¦ï¼Œé‡‡æ ·ç‚¹çš„ä¸ªæ•° */
 
 /* Representation of a latency sample: the sampling time and the latency
  * observed in milliseconds. */
-//zw ÑÓÊ±²ÉÑùµã
+//zw å»¶æ—¶é‡‡æ ·ç‚¹
 struct latencySample {
-    int32_t time; /* We don't use time_t to force 4 bytes usage everywhere. ²ÉÑù´´½¨Ê±¼ä£¨ºÁÃë£©*/
-    uint32_t latency; /* Latency in milliseconds. ÑÓÊ±µÄ¾ßÌåÊ±¼ä£¨ºÁÃë£©*/
+    int32_t time; /* We don't use time_t to force 4 bytes usage everywhere. é‡‡æ ·åˆ›å»ºæ—¶é—´ï¼ˆæ¯«ç§’ï¼‰*/
+    uint32_t latency; /* Latency in milliseconds. å»¶æ—¶çš„å…·ä½“æ—¶é—´ï¼ˆæ¯«ç§’ï¼‰*/
 };
 
 /* The latency time series for a given event. */
-//zw Õë¶ÔÄ³¸öÊÂ¼ş²É¼¯µÄÒ»ÏµÁĞÑÓÊ±²ÉÑùµã
+//zw é’ˆå¯¹æŸä¸ªäº‹ä»¶é‡‡é›†çš„ä¸€ç³»åˆ—å»¶æ—¶é‡‡æ ·ç‚¹
 struct latencyTimeSeries {
-    int idx; /* Index of the next sample to store. ÏÂÒ»¸öÑÓÊ±²ÉÑùµãµÄÏÂ±ê*/
-    uint32_t max; /* Max latency observed for this event. ×î´óµÄÑÓÊ±*/
-    struct latencySample samples[LATENCY_TS_LEN]; /* Latest history. ÀúÊ·ÑÓÊ±²ÉÑùµã*/
+    int idx; /* Index of the next sample to store. ä¸‹ä¸€ä¸ªå»¶æ—¶é‡‡æ ·ç‚¹çš„ä¸‹æ ‡*/
+    uint32_t max; /* Max latency observed for this event. æœ€å¤§çš„å»¶æ—¶*/
+    struct latencySample samples[LATENCY_TS_LEN]; /* Latest history. å†å²å»¶æ—¶é‡‡æ ·ç‚¹*/
 };
 
 /* Latency statistics structure. */
-//zw ÑÓÊ±²ÉÑùÊı¾İÍ³¼Æ½á¹û
+//zw å»¶æ—¶é‡‡æ ·æ•°æ®ç»Ÿè®¡ç»“æœ
 struct latencyStats {
-    uint32_t all_time_high; /* Absolute max observed since latest reset. ¾ø¶Ô×î¸ßµÄÑÓÊ±Ê±¼ä*/
-    uint32_t avg;           /* Average of current samples. Æ½¾ùÑÓÊ±Ê±¼ä*/
-    uint32_t min;           /* Min of current samples. ×îĞ¡ÑÓÊ±Ê±¼ä*/
-    uint32_t max;           /* Max of current samples. ×î´óÑÓÊ±Ê±¼ä*/
-    uint32_t mad;           /* Mean absolute deviation. Æ½¾ùÏà¶ÔÎó²î£¬ÓëÆ½¾ùÑÓÊ±Ïà±È*/
-    uint32_t samples;       /* Number of non-zero samples. ²ÉÑùµãµÄÊıÄ¿*/
-    time_t period;          /* Number of seconds since first event and now. ×îÔçµÄÑÓÊ±¼ÇÂ¼µãµÄ´´½¨Ê±¼ä Óëµ±Ç°Ê±¼äµÄ¼ä¸ô*/
+    uint32_t all_time_high; /* Absolute max observed since latest reset. ç»å¯¹æœ€é«˜çš„å»¶æ—¶æ—¶é—´*/
+    uint32_t avg;           /* Average of current samples. å¹³å‡å»¶æ—¶æ—¶é—´*/
+    uint32_t min;           /* Min of current samples. æœ€å°å»¶æ—¶æ—¶é—´*/
+    uint32_t max;           /* Max of current samples. æœ€å¤§å»¶æ—¶æ—¶é—´*/
+    uint32_t mad;           /* Mean absolute deviation. å¹³å‡ç›¸å¯¹è¯¯å·®ï¼Œä¸å¹³å‡å»¶æ—¶ç›¸æ¯”*/
+    uint32_t samples;       /* Number of non-zero samples. é‡‡æ ·ç‚¹çš„æ•°ç›®*/
+    time_t period;          /* Number of seconds since first event and now. æœ€æ—©çš„å»¶æ—¶è®°å½•ç‚¹çš„åˆ›å»ºæ—¶é—´ ä¸å½“å‰æ—¶é—´çš„é—´éš”*/
 };
 
-//zw ÑÓÊ±¼àÌı³õÊ¼»¯²Ù×÷£¬ ´´½¨dict
+//zw å»¶æ—¶ç›‘å¬åˆå§‹åŒ–æ“ä½œï¼Œ åˆ›å»ºdict
 void latencyMonitorInit(void);
-//zw Ìí¼ÓÑÓÊ±²ÉÑùµã
+//zw æ·»åŠ å»¶æ—¶é‡‡æ ·ç‚¹
 void latencyAddSample(char *event, mstime_t latency);
-//zw ÊÇ·ñÖ§³ÖÍ¸Ã÷´óÒ³(Transparent Huge Pages)
+//zw æ˜¯å¦æ”¯æŒé€æ˜å¤§é¡µ(Transparent Huge Pages)
 int THPIsEnabled(void);
 
 /* Latency monitoring macros. */
 
 /* Start monitoring an event. We just set the current time. */
-//zw ¶ÔÄ³¸öÊÂ¼şÉèÖÃ¼àÌı£¬¾ÍÊÇÉèÖÃÒ»ÏÂµ±Ç°µÄÊ±¼ä
+//zw å¯¹æŸä¸ªäº‹ä»¶è®¾ç½®ç›‘å¬ï¼Œå°±æ˜¯è®¾ç½®ä¸€ä¸‹å½“å‰çš„æ—¶é—´
 #define latencyStartMonitor(var) if (server.latency_monitor_threshold) { \
     var = mstime(); \
 } else { \
@@ -84,20 +84,20 @@ int THPIsEnabled(void);
 
 /* End monitoring an event, compute the difference with the current time
  * to check the amount of time elapsed. */
-//zw ½áÊø¼àÌı£¬Ëã³ö¹ıÁË¶àÉÙÊ±¼ä
+//zw ç»“æŸç›‘å¬ï¼Œç®—å‡ºè¿‡äº†å¤šå°‘æ—¶é—´
 #define latencyEndMonitor(var) if (server.latency_monitor_threshold) { \
     var = mstime() - var; \
 }
 
 /* Add the sample only if the elapsed time is >= to the configured threshold. */
-//zw Èç¹ûÑÓÊ±Ê±¼ä³¬³öserver.latency_monitor_threshold£¬Ôò½«Sample¼ÓÈëÑÓÊ±ÁĞ±íÖĞ
+//zw å¦‚æœå»¶æ—¶æ—¶é—´è¶…å‡ºserver.latency_monitor_thresholdï¼Œåˆ™å°†SampleåŠ å…¥å»¶æ—¶åˆ—è¡¨ä¸­
 #define latencyAddSampleIfNeeded(event,var) \
     if (server.latency_monitor_threshold && \
         (var) >= server.latency_monitor_threshold) \
           latencyAddSample((event),(var));
 
 /* Remove time from a nested event. */
-//zw ÒÆ³ıÆäËûÇ©µ½ÔÚÀïÃæµÄÊ±¼ä£¬ ÕâÀïÓÃ¼Ó·¨£¬ÊÇ½«ÆğÊ¼Ê±¼äÏòºóÒÆ£¬×îÖÕºÄÊ±¼õÉÙ
+//zw ç§»é™¤å…¶ä»–ç­¾åˆ°åœ¨é‡Œé¢çš„æ—¶é—´ï¼Œ è¿™é‡Œç”¨åŠ æ³•ï¼Œæ˜¯å°†èµ·å§‹æ—¶é—´å‘åç§»ï¼Œæœ€ç»ˆè€—æ—¶å‡å°‘
 #define latencyRemoveNestedEvent(event_var,nested_var) \
     event_var += nested_var;
 

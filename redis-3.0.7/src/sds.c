@@ -48,17 +48,17 @@
  * You can print the string with printf() as there is an implicit \0 at the
  * end of the string. However the string is binary safe and can contain
  * \0 characters in the middle, as the length is stored in the sds header. */
-//zw ¸ù¾İ¸ø³õÊ¼»¯²ÎÊıinitºÍ¸ø¶¨³¤¶È´´½¨ĞÂµÄ×Ö·û´®
+//zw æ ¹æ®ç»™åˆå§‹åŒ–å‚æ•°initå’Œç»™å®šé•¿åº¦åˆ›å»ºæ–°çš„å­—ç¬¦ä¸²
 sds sdsnewlen(const void *init, size_t initlen) {
     struct sdshdr *sh;
     
-    //zw Èç¹û¸øÁËinit¾Í·ÖÅäÄÚ´æ£¬ Èç¹ûÃ»ÓĞ¸øinit£¬¾Í·ÖÅä²¢Çå¿ÕÄÚ´æ£¬+1 ÓÃÓÚ´æ·Å '\0'
+    //zw å¦‚æœç»™äº†initå°±åˆ†é…å†…å­˜ï¼Œ å¦‚æœæ²¡æœ‰ç»™initï¼Œå°±åˆ†é…å¹¶æ¸…ç©ºå†…å­˜ï¼Œ+1 ç”¨äºå­˜æ”¾ '\0'
     if (init) {
         sh = zmalloc(sizeof(struct sdshdr)+initlen+1);
     } else {
         sh = zcalloc(sizeof(struct sdshdr)+initlen+1);
     }
-    //zw ·ÖÅäÊ§°Ü
+    //zw åˆ†é…å¤±è´¥
     if (sh == NULL) return NULL;
     sh->len = initlen;
     sh->free = 0;
@@ -88,7 +88,7 @@ sds sdsdup(const sds s) {
 /* Free an sds string. No operation is performed if 's' is NULL. */
 void sdsfree(sds s) {
     if (s == NULL) return;
-    //zw ÊÍ·Å¶ÔÓ¦µÄsdshdr½á¹¹Ìå
+    //zw é‡Šæ”¾å¯¹åº”çš„sdshdrç»“æ„ä½“
     zfree(s-sizeof(struct sdshdr));
 }
 
@@ -106,7 +106,7 @@ void sdsfree(sds s) {
  * The output will be "2", but if we comment out the call to sdsupdatelen()
  * the output will be "6" as the string was modified but the logical length
  * remains 6 bytes. */
-//zw ¸üĞÂ×Ö·û´®µÄ³¤¶È
+//zw æ›´æ–°å­—ç¬¦ä¸²çš„é•¿åº¦
 void sdsupdatelen(sds s) {
     struct sdshdr *sh = (void*) (s-(sizeof(struct sdshdr)));
     int reallen = strlen(s);
@@ -131,18 +131,18 @@ void sdsclear(sds s) {
  *
  * Note: this does not change the *length* of the sds string as returned
  * by sdslen(), but only the free buffer space we have. */
-//zw È·±£sdsÖĞµÄ¿ÉÓÃ¿Õ¼ä´óÓÚ»òµÈÓÚaddlen£¬Èç¹ûµ±Ç°×Ö·û´®¿ÉÓÃ¿Õ¼ä²»Âú×ãÔòÖØĞÂÅäÖÃ¿Õ¼ä
+//zw ç¡®ä¿sdsä¸­çš„å¯ç”¨ç©ºé—´å¤§äºæˆ–ç­‰äºaddlenï¼Œå¦‚æœå½“å‰å­—ç¬¦ä¸²å¯ç”¨ç©ºé—´ä¸æ»¡è¶³åˆ™é‡æ–°é…ç½®ç©ºé—´
 sds sdsMakeRoomFor(sds s, size_t addlen) {
     struct sdshdr *sh, *newsh;
     size_t free = sdsavail(s);
     size_t len, newlen;
     
-    //zw µ±Ç°¿Õ¼äÂú×ãÒªÇó£¬Ö±½Ó·µ»Ø
+    //zw å½“å‰ç©ºé—´æ»¡è¶³è¦æ±‚ï¼Œç›´æ¥è¿”å›
     if (free >= addlen) return s;
     len = sdslen(s);
     sh = (void*) (s-(sizeof(struct sdshdr)));
     newlen = (len+addlen);
-    //zw ÖØĞÂ·ÖÅäÄÚ´æ£¬ ÔÚSDS_MAX_PREALLOCÏÂ£¬ÒÔ±¶ÊıÔö³¤£¬·ñÔò+SDS_MAX_PREALLOC
+    //zw é‡æ–°åˆ†é…å†…å­˜ï¼Œ åœ¨SDS_MAX_PREALLOCä¸‹ï¼Œä»¥å€æ•°å¢é•¿ï¼Œå¦åˆ™+SDS_MAX_PREALLOC
     if (newlen < SDS_MAX_PREALLOC)
         newlen *= 2;
     else
@@ -160,7 +160,7 @@ sds sdsMakeRoomFor(sds s, size_t addlen) {
  *
  * After the call, the passed sds string is no longer valid and all the
  * references must be substituted with the new pointer returned by the call. */
-//zw ÊÍ·Å×Ö·ûÊı×ébufÖĞµÄ¶àÓà¿Õ¼ä£¬Ê¹Æä¸ÕºÃÄÜ´æ·Åµ±Ç°×Ö·ûÊı
+//zw é‡Šæ”¾å­—ç¬¦æ•°ç»„bufä¸­çš„å¤šä½™ç©ºé—´ï¼Œä½¿å…¶åˆšå¥½èƒ½å­˜æ”¾å½“å‰å­—ç¬¦æ•°
 sds sdsRemoveFreeSpace(sds s) {
     struct sdshdr *sh;
 
@@ -177,7 +177,7 @@ sds sdsRemoveFreeSpace(sds s) {
  * 3) The free buffer at the end if any.
  * 4) The implicit null term.
  */
-//zw »ñÈ¡sdsÊµ¼Ê·ÖÅäµÄ¿Õ¼ä´óĞ¡£¨°üÀ¨×îºóµÄ'\0'½áÊø·û£©
+//zw è·å–sdså®é™…åˆ†é…çš„ç©ºé—´å¤§å°ï¼ˆåŒ…æ‹¬æœ€åçš„'\0'ç»“æŸç¬¦ï¼‰
 size_t sdsAllocSize(sds s) {
     struct sdshdr *sh = (void*) (s-(sizeof(struct sdshdr)));
 
@@ -207,11 +207,11 @@ size_t sdsAllocSize(sds s) {
  * ... check for nread <= 0 and handle it ...
  * sdsIncrLen(s, nread);
  */
-//zw ¸ù¾İ¸ø¶¨²ÎÊıincrµ÷Õûµ±Ç°³¤¶ÈºÍ¿ÉÓÃ¿Õ¼ä´óĞ¡
+//zw æ ¹æ®ç»™å®šå‚æ•°incrè°ƒæ•´å½“å‰é•¿åº¦å’Œå¯ç”¨ç©ºé—´å¤§å°
 void sdsIncrLen(sds s, int incr) {
     struct sdshdr *sh = (void*) (s-(sizeof(struct sdshdr)));
 
-    //zw ÅĞ¶Ï²ÎÊıincrÊÇ·ñºÏ·¨£¬Èç¹û²»ºÏ·¨ËµÃ÷Êı¾İÒÑ¾­·¢Éú´íÎó
+    //zw åˆ¤æ–­å‚æ•°incræ˜¯å¦åˆæ³•ï¼Œå¦‚æœä¸åˆæ³•è¯´æ˜æ•°æ®å·²ç»å‘ç”Ÿé”™è¯¯
     if (incr >= 0)
         assert(sh->free >= (unsigned int)incr);
     else
@@ -226,7 +226,7 @@ void sdsIncrLen(sds s, int incr) {
  *
  * if the specified length is smaller than the current length, no operation
  * is performed. */
-//zw À©Õ¹×Ö·û´®µ½Ö¸¶¨µÄ³¤¶È
+//zw æ‰©å±•å­—ç¬¦ä¸²åˆ°æŒ‡å®šçš„é•¿åº¦
 sds sdsgrowzero(sds s, size_t len) {
     struct sdshdr *sh = (void*)(s-(sizeof(struct sdshdr)));
     size_t totlen, curlen = sh->len;
@@ -311,7 +311,7 @@ sds sdscpy(sds s, const char *t) {
  * The function returns the length of the null-terminated string
  * representation stored at 's'. */
 #define SDS_LLSTR_SIZE 21
-//zw ½«Ò»¸ölong longÀàĞÍµÄÊı×é×ª»¯Îª×Ö·û´®
+//zw å°†ä¸€ä¸ªlong longç±»å‹çš„æ•°ç»„è½¬åŒ–ä¸ºå­—ç¬¦ä¸²
 int sdsll2str(char *s, long long value) {
     char *p, aux;
     unsigned long long v;
@@ -319,7 +319,7 @@ int sdsll2str(char *s, long long value) {
 
     /* Generate the string representation, this method produces
      * an reversed string. */
-    //zw µÃµ½µÄ×Ö·û´®ÊÇÄæÖÃµÄ£¨Èç123 => "321"£©
+    //zw å¾—åˆ°çš„å­—ç¬¦ä¸²æ˜¯é€†ç½®çš„ï¼ˆå¦‚123 => "321"ï¼‰
     v = (value < 0) ? -value : value;
     p = s;
     do {
@@ -333,7 +333,7 @@ int sdsll2str(char *s, long long value) {
     *p = '\0';
 
     /* Reverse the string. */
-    //zw ½«×Ö·û´®ÄæÖÃ£¨Ë«Ö¸Õë·¨£©
+    //zw å°†å­—ç¬¦ä¸²é€†ç½®ï¼ˆåŒæŒ‡é’ˆæ³•ï¼‰
     p--;
     while(s < p) {
         aux = *s;
@@ -346,7 +346,7 @@ int sdsll2str(char *s, long long value) {
 }
 
 /* Identical sdsll2str(), but for unsigned long long type. */
-//zw sdsll2strº¯ÊıµÄunsigned long long°æ£¬¸úlong long°æ´óÍ¬Ğ¡Òì
+//zw sdsll2strå‡½æ•°çš„unsigned long longç‰ˆï¼Œè·Ÿlong longç‰ˆå¤§åŒå°å¼‚
 int sdsull2str(char *s, unsigned long long v) {
     char *p, aux;
     size_t l;
@@ -379,7 +379,7 @@ int sdsull2str(char *s, unsigned long long v) {
  *
  * sdscatprintf(sdsempty(),"%lld\n", value);
  */
-//zw ½«Ò»¸ölong longÀàĞÍµÄÊı×Ö×ª»»Îª×Ö·û´®sds
+//zw å°†ä¸€ä¸ªlong longç±»å‹çš„æ•°å­—è½¬æ¢ä¸ºå­—ç¬¦ä¸²sds
 sds sdsfromlonglong(long long value) {
     char buf[SDS_LLSTR_SIZE];
     int len = sdsll2str(buf,value);
@@ -388,7 +388,7 @@ sds sdsfromlonglong(long long value) {
 }
 
 /* Like sdscatprintf() but gets va_list instead of being variadic. */
-//zw ½«¸ñÊ½»¯Êä³öµÄ²ÎÊıÁ¬½Óµ½×Ö·û´®sºóÃæ
+//zw å°†æ ¼å¼åŒ–è¾“å‡ºçš„å‚æ•°è¿æ¥åˆ°å­—ç¬¦ä¸²såé¢
 sds sdscatvprintf(sds s, const char *fmt, va_list ap) {
     va_list cpy;
     char staticbuf[1024], *buf = staticbuf, *t;
@@ -396,7 +396,7 @@ sds sdscatvprintf(sds s, const char *fmt, va_list ap) {
 
     /* We try to start using a static buffer for speed.
      * If not possible we revert to heap allocation. */
-    //zw Èç¹ûfmt³¤¶ÈµÄÁ½±¶Ğ¡ÓÚ1024£¬ÔòÖ±½ÓÊ¹ÓÃ¶¨ÒåºÃµÄ»º³åÇøstaticbuf£¬·ñÔòÔÚ¶ÑÉÏ·ÖÅäÒ»¸öĞÂµÄ»º³åÇø¿Õ¼ä
+    //zw å¦‚æœfmté•¿åº¦çš„ä¸¤å€å°äº1024ï¼Œåˆ™ç›´æ¥ä½¿ç”¨å®šä¹‰å¥½çš„ç¼“å†²åŒºstaticbufï¼Œå¦åˆ™åœ¨å †ä¸Šåˆ†é…ä¸€ä¸ªæ–°çš„ç¼“å†²åŒºç©ºé—´
     if (buflen > sizeof(staticbuf)) {
         buf = zmalloc(buflen);
         if (buf == NULL) return NULL;
@@ -407,13 +407,13 @@ sds sdscatvprintf(sds s, const char *fmt, va_list ap) {
     /* Try with buffers two times bigger every time we fail to
      * fit the string in the current buffer size. */
     while(1) {
-        //zw ¸ø»º³åÇøµÄµ¹ÊıµÚ¶şÎ»´òÒ»¸ö½áÊø·û±ê¼Ç
+        //zw ç»™ç¼“å†²åŒºçš„å€’æ•°ç¬¬äºŒä½æ‰“ä¸€ä¸ªç»“æŸç¬¦æ ‡è®°
         buf[buflen-2] = '\0';
         va_copy(cpy,ap);
-        //zw ¸ñÊ½»¯Êä³öµ½»º³åÇøÖĞ
+        //zw æ ¼å¼åŒ–è¾“å‡ºåˆ°ç¼“å†²åŒºä¸­
         vsnprintf(buf, buflen, fmt, cpy);
         va_end(cpy);
-        //zw Èç¹ûÏÈÇ°´òµÄ±ê¼Ç±»¸²¸Ç£¬ËµÃ÷»º³åÇø»¹ÊÇĞ¡ÁË£¬½«»º³åÇøÀ©´óÁ½±¶¼ÌĞø³¢ÊÔ
+        //zw å¦‚æœå…ˆå‰æ‰“çš„æ ‡è®°è¢«è¦†ç›–ï¼Œè¯´æ˜ç¼“å†²åŒºè¿˜æ˜¯å°äº†ï¼Œå°†ç¼“å†²åŒºæ‰©å¤§ä¸¤å€ç»§ç»­å°è¯•
         if (buf[buflen-2] != '\0') {
             if (buf != staticbuf) zfree(buf);
             buflen *= 2;
@@ -425,7 +425,7 @@ sds sdscatvprintf(sds s, const char *fmt, va_list ap) {
     }
 
     /* Finally concat the obtained string to the SDS string and return it. */
-    //zw ×îºó½«¸ñÊ½»¯Êä³öµÄ×Ö·û´®Á¬½Óµ½Ô´×Ö·û´®sÎ²²¿
+    //zw æœ€åå°†æ ¼å¼åŒ–è¾“å‡ºçš„å­—ç¬¦ä¸²è¿æ¥åˆ°æºå­—ç¬¦ä¸²så°¾éƒ¨
     t = sdscat(s, buf);
     if (buf != staticbuf) zfree(buf);
     return t;
@@ -447,7 +447,7 @@ sds sdscatvprintf(sds s, const char *fmt, va_list ap) {
  *
  * s = sdscatprintf(sdsempty(), "... your format ...", args);
  */
-//zw ÀàËÆsdscatvprintfº¯Êı£¬Ö»ÊÇÊ¹ÓÃÁË¿É±ä²ÎÊı
+//zw ç±»ä¼¼sdscatvprintfå‡½æ•°ï¼Œåªæ˜¯ä½¿ç”¨äº†å¯å˜å‚æ•°
 sds sdscatprintf(sds s, const char *fmt, ...) {
     va_list ap;
     char *t;
@@ -473,7 +473,7 @@ sds sdscatprintf(sds s, const char *fmt, ...) {
  * %U - 64 bit unsigned integer (unsigned long long, uint64_t)
  * %% - Verbatim "%" character.
  */
-//zw ¸ñÊ½»¯ÊäÈë
+//zw æ ¼å¼åŒ–è¾“å…¥
 sds sdscatfmt(sds s, char const *fmt, ...) {
     struct sdshdr *sh = (void*) (s-(sizeof(struct sdshdr)));
     size_t initlen = sdslen(s);
@@ -481,11 +481,11 @@ sds sdscatfmt(sds s, char const *fmt, ...) {
     int i;
     va_list ap;
     
-    //zw »ñÈ¡¿É±ä²ÎÊı
+    //zw è·å–å¯å˜å‚æ•°
     va_start(ap,fmt);
     f = fmt;    /* Next format specifier byte to process. */
     i = initlen; /* Position of the next byte to write to dest str. */
-    //zw ´Ó×óÍùÓÒÒ»´ÎÉ¨Ãè¸ñÊ½»¯×Ö·û´®
+    //zw ä»å·¦å¾€å³ä¸€æ¬¡æ‰«ææ ¼å¼åŒ–å­—ç¬¦ä¸²
     while(*f) {
         char next, *str;
         unsigned int l;
@@ -493,7 +493,7 @@ sds sdscatfmt(sds s, char const *fmt, ...) {
         unsigned long long unum;
 
         /* Make sure there is always space for at least 1 char. */
-        //zw È·±£ÖÁÉÙÓĞÒ»¸öÎ»ÖÃµÄ¿ÉÓÃ¿Õ¼ä
+        //zw ç¡®ä¿è‡³å°‘æœ‰ä¸€ä¸ªä½ç½®çš„å¯ç”¨ç©ºé—´
         if (sh->free == 0) {
             s = sdsMakeRoomFor(s,1);
             sh = (void*) (s-(sizeof(struct sdshdr)));
@@ -591,7 +591,7 @@ sds sdscatfmt(sds s, char const *fmt, ...) {
  *
  * Output will be just "Hello World".
  */
-//zw ×Ö·û´®µÄtrim²Ù×÷£¬¸ß¼¶ÓïÑÔÆÕ±éÌá¹©£¬È¥µôÇ°ºóµÄcsetÖĞ×Ö·û
+//zw å­—ç¬¦ä¸²çš„trimæ“ä½œï¼Œé«˜çº§è¯­è¨€æ™®éæä¾›ï¼Œå»æ‰å‰åçš„csetä¸­å­—ç¬¦
 sds sdstrim(sds s, const char *cset) {
     struct sdshdr *sh = (void*) (s-(sizeof(struct sdshdr)));
     char *start, *end, *sp, *ep;
@@ -625,13 +625,13 @@ sds sdstrim(sds s, const char *cset) {
  * s = sdsnew("Hello World");
  * sdsrange(s,1,-1); => "ello World"
  */
-//zw ×Ö·û´®½ØÈ¡
+//zw å­—ç¬¦ä¸²æˆªå–
 void sdsrange(sds s, int start, int end) {
     struct sdshdr *sh = (void*) (s-(sizeof(struct sdshdr)));
     size_t newlen, len = sdslen(s);
 
     if (len == 0) return;
-    //zw Ö§³Ö¸ºÏÂ±ê
+    //zw æ”¯æŒè´Ÿä¸‹æ ‡
     if (start < 0) {
         start = len+start;
         if (start < 0) start = 0;
@@ -640,9 +640,9 @@ void sdsrange(sds s, int start, int end) {
         end = len+end;
         if (end < 0) end = 0;
     }
-    //zw È·¶¨½ØÈ¡×Ó´®³¤¶È
+    //zw ç¡®å®šæˆªå–å­ä¸²é•¿åº¦
     newlen = (start > end) ? 0 : (end-start)+1;
-    //zw ÑéÖ¤startºÍendÖ¸¶¨µÄ·¶Î§ÊÇ·ñºÏ·¨£¬Èç¹û²»ºÏ·¨Ôò×öÏàÓ¦ĞŞ¸Ä
+    //zw éªŒè¯startå’ŒendæŒ‡å®šçš„èŒƒå›´æ˜¯å¦åˆæ³•ï¼Œå¦‚æœä¸åˆæ³•åˆ™åšç›¸åº”ä¿®æ”¹
     if (newlen != 0) {
         if (start >= (signed)len) {
             newlen = 0;
@@ -653,7 +653,7 @@ void sdsrange(sds s, int start, int end) {
     } else {
         start = 0;
     }
-    // ÒÆ¶¯×Ó´®
+    // ç§»åŠ¨å­ä¸²
     if (start && newlen) memmove(sh->buf, sh->buf+start, newlen);
     sh->buf[newlen] = 0;
     sh->free = sh->free+(sh->len-newlen);
@@ -713,14 +713,14 @@ int sdscmp(const sds s1, const sds s2) {
  * requires length arguments. sdssplit() is just the
  * same function but for zero-terminated strings.
  */
-//zw ×Ö·û´®·Ö¸îº¯Êı£¬¸ù¾İ²ÎÊısep·Ö¸îÔ´´®£¬·µ»ØsdsÊı×é£¬ÆäÖĞ£º²ÎÊıcount´æ·Å·Ö¸îºó×Ó´®ÊıÁ¿
+//zw å­—ç¬¦ä¸²åˆ†å‰²å‡½æ•°ï¼Œæ ¹æ®å‚æ•°sepåˆ†å‰²æºä¸²ï¼Œè¿”å›sdsæ•°ç»„ï¼Œå…¶ä¸­ï¼šå‚æ•°countå­˜æ”¾åˆ†å‰²åå­ä¸²æ•°é‡
 sds *sdssplitlen(const char *s, int len, const char *sep, int seplen, int *count) {
     int elements = 0, slots = 5, start = 0, j;
-    //zw ±£´æ·Ö¸îºóµÄ½á¹û
+    //zw ä¿å­˜åˆ†å‰²åçš„ç»“æœ
     sds *tokens;
 
     if (seplen < 1 || len < 0) return NULL;
-    //zw ·ÖÅä¿Õ¼ä£¬·Ö¸îµÄ×Ó´®³õÊ¼ÖµÖ»ÓĞ5×é£¬Èç¹û²»¹»ÔÙÖØĞÂ·ÖÅä
+    //zw åˆ†é…ç©ºé—´ï¼Œåˆ†å‰²çš„å­ä¸²åˆå§‹å€¼åªæœ‰5ç»„ï¼Œå¦‚æœä¸å¤Ÿå†é‡æ–°åˆ†é…
     tokens = zmalloc(sizeof(sds)*slots);
     if (tokens == NULL) return NULL;
 
@@ -728,10 +728,10 @@ sds *sdssplitlen(const char *s, int len, const char *sep, int seplen, int *count
         *count = 0;
         return tokens;
     }
-    //zw ´Ó×óÍùÓÒ±éÀúÔ´´®¡£ÏÔÈ»×îºóÒ»¸öÄÜÆ¥ÅäµÄ·Ö¸î·ûsepµÄÎ»ÖÃÎªlen-(seplen-1)
+    //zw ä»å·¦å¾€å³éå†æºä¸²ã€‚æ˜¾ç„¶æœ€åä¸€ä¸ªèƒ½åŒ¹é…çš„åˆ†å‰²ç¬¦sepçš„ä½ç½®ä¸ºlen-(seplen-1)
     for (j = 0; j < (len-(seplen-1)); j++) {
         /* make sure there is room for the next element and the final one */
-        //zw ½á¹û×Ö·û´®Êı×éµÄ³¤¶ÈÉÙÓÚµ±Ç°ÒÑ´æ×Ö·û´®³¤¶È+2µÄÊ±£¬ÖØĞÂ·ÖÅä
+        //zw ç»“æœå­—ç¬¦ä¸²æ•°ç»„çš„é•¿åº¦å°‘äºå½“å‰å·²å­˜å­—ç¬¦ä¸²é•¿åº¦+2çš„æ—¶ï¼Œé‡æ–°åˆ†é…
         if (slots < elements+2) {
             sds *newtokens;
 
@@ -741,9 +741,9 @@ sds *sdssplitlen(const char *s, int len, const char *sep, int seplen, int *count
             tokens = newtokens;
         }
         /* search the separator */
-        //zw ÕâÀï·Ö³Éµ¥×Ö·û±È½ÏºÍ¶à×Ö·û±È½Ï
+        //zw è¿™é‡Œåˆ†æˆå•å­—ç¬¦æ¯”è¾ƒå’Œå¤šå­—ç¬¦æ¯”è¾ƒ
         if ((seplen == 1 && *(s+j) == sep[0]) || (memcmp(s+j,sep,seplen) == 0)) {
-            //zw ÕÒµ½Ò»¸ö·Ö¸ô·û£¬´´½¨Ò»¸öĞÂµÄsds
+            //zw æ‰¾åˆ°ä¸€ä¸ªåˆ†éš”ç¬¦ï¼Œåˆ›å»ºä¸€ä¸ªæ–°çš„sds
             tokens[elements] = sdsnewlen(s+start,j-start);
             if (tokens[elements] == NULL) goto cleanup;
             elements++;
@@ -752,14 +752,14 @@ sds *sdssplitlen(const char *s, int len, const char *sep, int seplen, int *count
         }
     }
     /* Add the final element. We are sure there is room in the tokens array. */
-    //zw Ìí¼Ó×îºóÒ»¸ö×Ó×Ö·û´®
+    //zw æ·»åŠ æœ€åä¸€ä¸ªå­å­—ç¬¦ä¸²
     tokens[elements] = sdsnewlen(s+start,len-start);
     if (tokens[elements] == NULL) goto cleanup;
     elements++;
     *count = elements;
     return tokens;
 
-//zw ÏÂÃæÊÇÊÍ·ÅÄÚ´æ¿Õ¼ä²Ù×÷£¬Èç¹û¶¯Ì¬Ôö³¤tokens¿Õ¼ä³ö´í£¬ĞèÒªÇåÀíÆäÒÑ·ÖÅäµÄÄÚ´æ¿Õ¼ä
+//zw ä¸‹é¢æ˜¯é‡Šæ”¾å†…å­˜ç©ºé—´æ“ä½œï¼Œå¦‚æœåŠ¨æ€å¢é•¿tokensç©ºé—´å‡ºé”™ï¼Œéœ€è¦æ¸…ç†å…¶å·²åˆ†é…çš„å†…å­˜ç©ºé—´
 cleanup:
     {
         int i;
@@ -771,7 +771,7 @@ cleanup:
 }
 
 /* Free the result returned by sdssplitlen(), or do nothing if 'tokens' is NULL. */
-//zw ÊÍ·Åsdssplitlenº¯Êı·µ»ØµÄsdsÊı×é
+//zw é‡Šæ”¾sdssplitlenå‡½æ•°è¿”å›çš„sdsæ•°ç»„
 void sdsfreesplitres(sds *tokens, int count) {
     if (!tokens) return;
     while(count--)
@@ -785,7 +785,7 @@ void sdsfreesplitres(sds *tokens, int count) {
  *
  * After the call, the modified sds string is no longer valid and all the
  * references must be substituted with the new pointer returned by the call. */
-//zw °Ñ×Ö·û´®×ªÎªÒıºÅ°üº¬µÄ×Ö·û´®£¬×ªÒå×Ö·û»¹Ô­£¨¿É¼û£©£¬·Ç´òÓ¡×Ö·û×ª16½øÖÆ
+//zw æŠŠå­—ç¬¦ä¸²è½¬ä¸ºå¼•å·åŒ…å«çš„å­—ç¬¦ä¸²ï¼Œè½¬ä¹‰å­—ç¬¦è¿˜åŸï¼ˆå¯è§ï¼‰ï¼Œéæ‰“å°å­—ç¬¦è½¬16è¿›åˆ¶
 sds sdscatrepr(sds s, const char *p, size_t len) {
     s = sdscatlen(s,"\"",1);
     while(len--) {
@@ -813,7 +813,7 @@ sds sdscatrepr(sds s, const char *p, size_t len) {
 
 /* Helper function for sdssplitargs() that returns non zero if 'c'
  * is a valid hex digit. */
-//zw ÅĞ¶ÏÒ»¸ö¸ø¶¨×Ö·ûÊÇ·ñÊÇÊ®Áù½øÖÆÊı
+//zw åˆ¤æ–­ä¸€ä¸ªç»™å®šå­—ç¬¦æ˜¯å¦æ˜¯åå…­è¿›åˆ¶æ•°
 int is_hex_digit(char c) {
     return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') ||
            (c >= 'A' && c <= 'F');
@@ -821,7 +821,7 @@ int is_hex_digit(char c) {
 
 /* Helper function for sdssplitargs() that converts a hex digit into an
  * integer from 0 to 15 */
-//zw ½«Ò»¸öÊ®Áù½øÖÆ×Ö·û×ª»»ÎªÏàÓ¦µÄÊ®½øÖÆÊı×Ö
+//zw å°†ä¸€ä¸ªåå…­è¿›åˆ¶å­—ç¬¦è½¬æ¢ä¸ºç›¸åº”çš„åè¿›åˆ¶æ•°å­—
 int hex_digit_to_int(char c) {
     switch(c) {
     case '0': return 0;

@@ -31,14 +31,14 @@
 #define SLOWLOG_ENTRY_MAX_STRING 128
 
 /* This structure defines an entry inside the slow log list */
-//zw SlowLog¼ÇÂ¼µÄÊÇÏµÍ³×î½üN¸ö³¬¹ıÒ»¶¨Ê±¼äµÄ²éÑ¯£¬¾ÍÊÇ±È½ÏºÄÊ±µÄ²éÑ¯
-//zw ÂıÈÕÖ¾½á¹¹Ìå£¬½«»á²åÈëµ½slowLogList,ÂıÈÕÖ¾ÁĞ±íÖĞ
+//zw SlowLogè®°å½•çš„æ˜¯ç³»ç»Ÿæœ€è¿‘Nä¸ªè¶…è¿‡ä¸€å®šæ—¶é—´çš„æŸ¥è¯¢ï¼Œå°±æ˜¯æ¯”è¾ƒè€—æ—¶çš„æŸ¥è¯¢
+//zw æ…¢æ—¥å¿—ç»“æ„ä½“ï¼Œå°†ä¼šæ’å…¥åˆ°slowLogList,æ…¢æ—¥å¿—åˆ—è¡¨ä¸­
 typedef struct slowlogEntry {
     robj **argv;
     int argc;
     long long id;       /* Unique entry identifier. */
-    long long duration; /* Time spent by the query, in nanoseconds. ºÄÊ±*/
-    time_t time;        /* Unix time at which the query was executed. Ö´ĞĞÊ±¼ä*/
+    long long duration; /* Time spent by the query, in nanoseconds. è€—æ—¶*/
+    time_t time;        /* Unix time at which the query was executed. æ‰§è¡Œæ—¶é—´*/
 } slowlogEntry;
 
 /* Exported API */

@@ -1,21 +1,21 @@
 #ifndef __REDIS_CLUSTER_H
 #define __REDIS_CLUSTER_H
 
-//zw reids ¼¯Èº
+//zw reids é›†ç¾¤
 
 /*-----------------------------------------------------------------------------
  * Redis cluster data structures, defines, exported API.
  *----------------------------------------------------------------------------*/
 
-#define REDIS_CLUSTER_SLOTS 16384	//zw ¼¯Èº
+#define REDIS_CLUSTER_SLOTS 16384	//zw é›†ç¾¤
 #define REDIS_CLUSTER_OK 0          /* Everything looks ok */
 #define REDIS_CLUSTER_FAIL 1        /* The cluster can't work */
 #define REDIS_CLUSTER_NAMELEN 40    /* sha1 hex length */
-#define REDIS_CLUSTER_PORT_INCR 10000 /* Cluster port = baseport + PORT_INCR ¼¯ÈºµÄ¶Ë¿Ú£¬¶Ë¿Ú = baseport + PORT_INCR*/
+#define REDIS_CLUSTER_PORT_INCR 10000 /* Cluster port = baseport + PORT_INCR é›†ç¾¤çš„ç«¯å£ï¼Œç«¯å£ = baseport + PORT_INCR*/
 
 /* The following defines are amount of time, sometimes expressed as
  * multiplicators of the node timeout value (when ending with MULT). */
-#define REDIS_CLUSTER_DEFAULT_NODE_TIMEOUT 15000	//zw ¼¯Èº½áµãÄ¬ÈÏ³¬Ê±Ê±¼ä
+#define REDIS_CLUSTER_DEFAULT_NODE_TIMEOUT 15000	//zw é›†ç¾¤ç»“ç‚¹é»˜è®¤è¶…æ—¶æ—¶é—´
 #define REDIS_CLUSTER_DEFAULT_SLAVE_VALIDITY 10 /* Slave max data age factor. */
 #define REDIS_CLUSTER_DEFAULT_REQUIRE_FULL_COVERAGE 1
 #define REDIS_CLUSTER_FAIL_REPORT_VALIDITY_MULT 2 /* Fail report validity. */
@@ -36,29 +36,29 @@
 #define REDIS_CLUSTER_REDIR_DOWN_STATE 5    /* -CLUSTERDOWN, global state. */
 #define REDIS_CLUSTER_REDIR_DOWN_UNBOUND 6  /* -CLUSTERDOWN, unbound slot. */
 
-//zw ¼¯Èº½áµã
+//zw é›†ç¾¤ç»“ç‚¹
 struct clusterNode;
 
 /* clusterLink encapsulates everything needed to talk with a remote node. */
-//zw clusterLink·â×°ÁËÓë¼¯Èº½áµãÍ¨Ñ¶µÄÊı¾İ
+//zw clusterLinkå°è£…äº†ä¸é›†ç¾¤ç»“ç‚¹é€šè®¯çš„æ•°æ®
 typedef struct clusterLink {
-    mstime_t ctime;             /* Link creation time //zw ´´½¨Ê±¼ä*/
+    mstime_t ctime;             /* Link creation time //zw åˆ›å»ºæ—¶é—´*/
     int fd;                     /* TCP socket file descriptor //zw socket fd*/
-    sds sndbuf;                 /* Packet send buffer //zw ·¢ËÍbuff*/
-    sds rcvbuf;                 /* Packet reception buffer //zw ½ÓÊÜbuff*/
-    struct clusterNode *node;   /* Node related to this link if any, or NULL //zw ÓëÖ®Ïà¹ØµÄÒ»Ğ©¼¯Èº½áµã*/
+    sds sndbuf;                 /* Packet send buffer //zw å‘é€buff*/
+    sds rcvbuf;                 /* Packet reception buffer //zw æ¥å—buff*/
+    struct clusterNode *node;   /* Node related to this link if any, or NULL //zw ä¸ä¹‹ç›¸å…³çš„ä¸€äº›é›†ç¾¤ç»“ç‚¹*/
 } clusterLink;
 
 /* Cluster node flags and macros. */
-#define REDIS_NODE_MASTER 1     /* The node is a master 	//zw Ö÷*/
-#define REDIS_NODE_SLAVE 2      /* The node is a slave 		//zw ´Ó*/
-#define REDIS_NODE_PFAIL 4      /* Failure? Need acknowledge //zw ÊÇ·ñ¹ÊÕÏ£¬»¹²»È·¶¨*/
-#define REDIS_NODE_FAIL 8       /* The node is believed to be malfunctioning //zw ÒÑ¾­È·¶¨ÊÇ¹ÊÕÏÁË*/
-#define REDIS_NODE_MYSELF 16    /* This node is myself //zw Õâ¸ö½áµã¾ÍÊÇ×Ô¼º */
-#define REDIS_NODE_HANDSHAKE 32 /* We have still to exchange the first ping //zw ÎÕÊÖ*/
-#define REDIS_NODE_NOADDR   64  /* We don't know the address of this node //zw ½áµãµØÖ·²»ÖªµÀ*/
-#define REDIS_NODE_MEET 128     /* Send a MEET message to this node //zw ·¢ËÍÒ»¸ömeet°ü*/
-#define REDIS_NODE_MIGRATE_TO 256 /* Master elegible for replica migration. //zw ºòÑ¡MasterÊı¾İÇ¨ÒÆ*/
+#define REDIS_NODE_MASTER 1     /* The node is a master 	//zw ä¸»*/
+#define REDIS_NODE_SLAVE 2      /* The node is a slave 		//zw ä»*/
+#define REDIS_NODE_PFAIL 4      /* Failure? Need acknowledge //zw æ˜¯å¦æ•…éšœï¼Œè¿˜ä¸ç¡®å®š*/
+#define REDIS_NODE_FAIL 8       /* The node is believed to be malfunctioning //zw å·²ç»ç¡®å®šæ˜¯æ•…éšœäº†*/
+#define REDIS_NODE_MYSELF 16    /* This node is myself //zw è¿™ä¸ªç»“ç‚¹å°±æ˜¯è‡ªå·± */
+#define REDIS_NODE_HANDSHAKE 32 /* We have still to exchange the first ping //zw æ¡æ‰‹*/
+#define REDIS_NODE_NOADDR   64  /* We don't know the address of this node //zw ç»“ç‚¹åœ°å€ä¸çŸ¥é“*/
+#define REDIS_NODE_MEET 128     /* Send a MEET message to this node //zw å‘é€ä¸€ä¸ªmeetåŒ…*/
+#define REDIS_NODE_MIGRATE_TO 256 /* Master elegible for replica migration. //zw å€™é€‰Masteræ•°æ®è¿ç§»*/
 #define REDIS_NODE_NULL_NAME "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
 
 #define nodeIsMaster(n) ((n)->flags & REDIS_NODE_MASTER)
@@ -77,51 +77,51 @@ typedef struct clusterLink {
 #define REDIS_CLUSTER_CANT_FAILOVER_WAITING_VOTES 4
 #define REDIS_CLUSTER_CANT_FAILOVER_RELOG_PERIOD (60*5) /* seconds. */
 
-/* This structure represent elements of node->fail_reports. Ê§°Ü±¨±í*/
+/* This structure represent elements of node->fail_reports. å¤±è´¥æŠ¥è¡¨*/
 typedef struct clusterNodeFailReport {
     struct clusterNode *node;  /* Node reporting the failure condition. */
     mstime_t time;             /* Time of the last report from this node. */
 } clusterNodeFailReport;
 
-//zw ¼¯Èº½áµã
+//zw é›†ç¾¤ç»“ç‚¹
 typedef struct clusterNode {
-    mstime_t ctime; /* Node object creation time. ½áµã´´½¨Ê±¼ä*/
-    char name[REDIS_CLUSTER_NAMELEN]; /* Node name, hex string, sha1-size ½áµãÃû³Æ*/
-    int flags;      /* REDIS_NODE_... ±êÖ¾*/
-    uint64_t configEpoch; /* Last configEpoch observed for this node ÅäÖÃ°æ±¾*/
-    unsigned char slots[REDIS_CLUSTER_SLOTS/8]; /* slots handled by this node ¸Ã½Úµã»á´¦ÀíµÄslot*/
+    mstime_t ctime; /* Node object creation time. ç»“ç‚¹åˆ›å»ºæ—¶é—´*/
+    char name[REDIS_CLUSTER_NAMELEN]; /* Node name, hex string, sha1-size ç»“ç‚¹åç§°*/
+    int flags;      /* REDIS_NODE_... æ ‡å¿—*/
+    uint64_t configEpoch; /* Last configEpoch observed for this node é…ç½®ç‰ˆæœ¬*/
+    unsigned char slots[REDIS_CLUSTER_SLOTS/8]; /* slots handled by this node è¯¥èŠ‚ç‚¹ä¼šå¤„ç†çš„slot*/
     int numslots;   /* Number of slots handled by this node */
-    int numslaves;  /* Number of slave nodes, if this is a master ´Ó·şÎñÆ÷¸öÊı*/
-    struct clusterNode **slaves; /* pointers to slave nodes ´Ó·şÎñÆ÷*/
+    int numslaves;  /* Number of slave nodes, if this is a master ä»æœåŠ¡å™¨ä¸ªæ•°*/
+    struct clusterNode **slaves; /* pointers to slave nodes ä»æœåŠ¡å™¨*/
     struct clusterNode *slaveof; /* pointer to the master node. Note that it
                                     may be NULL even if the node is a slave
                                     if we don't have the master node in our
-                                    tables. Ö÷·şÎñÆ÷*/
-    mstime_t ping_sent;      /* Unix time we sent latest ping ×î½üÒ»´ÎpingÊ±¼ä*/
-    mstime_t pong_received;  /* Unix time we received the pong ½ÓÊÜµ½pong*/
-    mstime_t fail_time;      /* Unix time when FAIL flag was set ÉèÖÃREDIS_NODE_FAIL±êÖ¾Ê±¼ä*/
-    mstime_t voted_time;     /* Last time we voted for a slave of this master ÉÏ´ÎÑ¡¾ÙÊ±¼ä*/
-    mstime_t repl_offset_time;  /* Unix time we received offset for this node ½ÓÊÜoffsetÊ±¼ä*/
+                                    tables. ä¸»æœåŠ¡å™¨*/
+    mstime_t ping_sent;      /* Unix time we sent latest ping æœ€è¿‘ä¸€æ¬¡pingæ—¶é—´*/
+    mstime_t pong_received;  /* Unix time we received the pong æ¥å—åˆ°pong*/
+    mstime_t fail_time;      /* Unix time when FAIL flag was set è®¾ç½®REDIS_NODE_FAILæ ‡å¿—æ—¶é—´*/
+    mstime_t voted_time;     /* Last time we voted for a slave of this master ä¸Šæ¬¡é€‰ä¸¾æ—¶é—´*/
+    mstime_t repl_offset_time;  /* Unix time we received offset for this node æ¥å—offsetæ—¶é—´*/
     mstime_t orphaned_time;     /* Starting time of orphaned master condition */
-    long long repl_offset;      /* Last known repl offset for this node. offsetÖµ*/
-    char ip[REDIS_IP_STR_LEN];  /* Latest known IP address of this node ×î½ü±»¼ÇÂ¼µÄµØÖ·*/
-    int port;                   /* Latest known port of this node ×î½ü±»¼ÇÂ¼µÄ¶Ë¿Ú*/
-    clusterLink *link;          /* TCP/IP link with this node Óë¸Ã½ÚµãµÄÁ¬½ÓÉÏÏÂÎÄ*/
+    long long repl_offset;      /* Last known repl offset for this node. offsetå€¼*/
+    char ip[REDIS_IP_STR_LEN];  /* Latest known IP address of this node æœ€è¿‘è¢«è®°å½•çš„åœ°å€*/
+    int port;                   /* Latest known port of this node æœ€è¿‘è¢«è®°å½•çš„ç«¯å£*/
+    clusterLink *link;          /* TCP/IP link with this node ä¸è¯¥èŠ‚ç‚¹çš„è¿æ¥ä¸Šä¸‹æ–‡*/
     list *fail_reports;         /* List of nodes signaling this as failing */
 } clusterNode;
 
-//zw ¼¯Èº×´Ì¬
+//zw é›†ç¾¤çŠ¶æ€
 typedef struct clusterState {
     clusterNode *myself;  /* This node */
-    uint64_t currentEpoch; //zw ÅäÖÃ°æ±¾
-    int state;            /* REDIS_CLUSTER_OK, REDIS_CLUSTER_FAIL, ... ¼¯ÈºµÄ×´Ì¬*/
+    uint64_t currentEpoch; //zw é…ç½®ç‰ˆæœ¬
+    int state;            /* REDIS_CLUSTER_OK, REDIS_CLUSTER_FAIL, ... é›†ç¾¤çš„çŠ¶æ€*/
     int size;             /* Num of master nodes with at least one slot */
-    dict *nodes;          /* Hash table of name -> clusterNode structures ´æ´¢ËùÓĞ½ÚµãµÄ¹şÏ£±í*/
-    dict *nodes_black_list; /* Nodes we don't re-add for a few seconds. ºÚÃûµ¥½Úµã£¬Ò»¶ÎÊ±¼äÄÚ²»»áÔÙ¼ÓÈëµ½¼¯ÈºÖĞ*/
-    clusterNode *migrating_slots_to[REDIS_CLUSTER_SLOTS];  //zw slot Êı¾İÕıÔÚÇ¨ÒÆµ½migrating_slots_to[slot] ½Úµã
-    clusterNode *importing_slots_from[REDIS_CLUSTER_SLOTS]; //zw slot Êı¾İÕıÔÚ´Óimporting_slots_from[slot] Ç¨ÒÆµ½±¾»ú
-    clusterNode *slots[REDIS_CLUSTER_SLOTS]; //zw slot Êı¾İÓÉslots[slot] ½ÚµãÀ´´¦Àí
-    zskiplist *slots_to_keys;//zw slot µ½key µÄÒ»¸öÓ³Éä
+    dict *nodes;          /* Hash table of name -> clusterNode structures å­˜å‚¨æ‰€æœ‰èŠ‚ç‚¹çš„å“ˆå¸Œè¡¨*/
+    dict *nodes_black_list; /* Nodes we don't re-add for a few seconds. é»‘åå•èŠ‚ç‚¹ï¼Œä¸€æ®µæ—¶é—´å†…ä¸ä¼šå†åŠ å…¥åˆ°é›†ç¾¤ä¸­*/
+    clusterNode *migrating_slots_to[REDIS_CLUSTER_SLOTS];  //zw slot æ•°æ®æ­£åœ¨è¿ç§»åˆ°migrating_slots_to[slot] èŠ‚ç‚¹
+    clusterNode *importing_slots_from[REDIS_CLUSTER_SLOTS]; //zw slot æ•°æ®æ­£åœ¨ä»importing_slots_from[slot] è¿ç§»åˆ°æœ¬æœº
+    clusterNode *slots[REDIS_CLUSTER_SLOTS]; //zw slot æ•°æ®ç”±slots[slot] èŠ‚ç‚¹æ¥å¤„ç†
+    zskiplist *slots_to_keys;//zw slot åˆ°key çš„ä¸€ä¸ªæ˜ å°„
     /* The following fields are used to take the slave state on elections. */
     mstime_t failover_auth_time; /* Time of previous or next election. */
     int failover_auth_count;    /* Number of votes received so far. */

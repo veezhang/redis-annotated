@@ -29,36 +29,36 @@
 
 #ifndef __SPARKLINE_H
 #define __SPARKLINE_H
-/*zw sparklineÊÇÒ»ÀàĞÅÏ¢Ìå»ıĞ¡ºÍÊı¾İÃÜ¶È¸ßµÄÍ¼±í¡£Ä¿Ç°Ëü±»ÓÃ×÷Ò»Ğ©²âÁ¿£¬ 
- *Ïà¹ØµÄ±ä»¯µÄĞÅÏ¢³ÊÏÖµÄ·½Ê½£¬ÈçÆ½¾ùÎÂ¶È£¬¹ÉÊĞ½»Í¶»îÔ¾¡£sparkline³£³£ÒÔÒ»×é¶àÌõµÄĞÎÊ½³öÏÖÔÚÖù×´Í¼£¬ÕÛÏßÍ¼µ±ÖĞ¡£ 
- *¿ÉÒÔÀí½âÎªÒ»¸öÍ¼ÏßĞÅÏ¢ */ 
+/*zw sparklineæ˜¯ä¸€ç±»ä¿¡æ¯ä½“ç§¯å°å’Œæ•°æ®å¯†åº¦é«˜çš„å›¾è¡¨ã€‚ç›®å‰å®ƒè¢«ç”¨ä½œä¸€äº›æµ‹é‡ï¼Œ 
+ *ç›¸å…³çš„å˜åŒ–çš„ä¿¡æ¯å‘ˆç°çš„æ–¹å¼ï¼Œå¦‚å¹³å‡æ¸©åº¦ï¼Œè‚¡å¸‚äº¤æŠ•æ´»è·ƒã€‚sparklineå¸¸å¸¸ä»¥ä¸€ç»„å¤šæ¡çš„å½¢å¼å‡ºç°åœ¨æŸ±çŠ¶å›¾ï¼ŒæŠ˜çº¿å›¾å½“ä¸­ã€‚ 
+ *å¯ä»¥ç†è§£ä¸ºä¸€ä¸ªå›¾çº¿ä¿¡æ¯ */ 
 /* A sequence is represented of many "samples" */
-//zw ¿ÉÒÔÀí½âÎªÍ¼ÏñÉÏµÄÒ»¸öĞÅÏ¢µã£¬ÓĞÎÄ×Ö£¬ÓĞÖµµÄ´óĞ¡
+//zw å¯ä»¥ç†è§£ä¸ºå›¾åƒä¸Šçš„ä¸€ä¸ªä¿¡æ¯ç‚¹ï¼Œæœ‰æ–‡å­—ï¼Œæœ‰å€¼çš„å¤§å°
 struct sample {
     double value;
     char *label;
 };
-//zw Í¼ÏßĞÅÏ¢½á¹¹Ìå£¬°üÀ¨n¸öÔªËØµã£¬¿ÉÒÔ¾İ´ËÃèÊö³öÍ¼£¬»æÍ¼µÄ¿É²»ÊÇÖ±½Ó°´µãºÍÖµÖ±½Ó»æÖÆµÄ
+//zw å›¾çº¿ä¿¡æ¯ç»“æ„ä½“ï¼ŒåŒ…æ‹¬nä¸ªå…ƒç´ ç‚¹ï¼Œå¯ä»¥æ®æ­¤æè¿°å‡ºå›¾ï¼Œç»˜å›¾çš„å¯ä¸æ˜¯ç›´æ¥æŒ‰ç‚¹å’Œå€¼ç›´æ¥ç»˜åˆ¶çš„
 struct sequence {
-    int length;                     //zw µ±Ç°ÔªËØµã¸öÊı
-    int labels;                     //zw ×Ü¹²µÄÎÄ×Ö¸öÊı£¬ÓĞĞ©µãÃ»ÓĞlabelÃèÊö£¬ÎªNULL
-    struct sample *samples;         //zw ÔªËØµãÁĞ±í
-    double min, max;                //zw ÔªËØÖĞµÄ×î´óÖµ£¬×îĞ¡Öµ
+    int length;                     //zw å½“å‰å…ƒç´ ç‚¹ä¸ªæ•°
+    int labels;                     //zw æ€»å…±çš„æ–‡å­—ä¸ªæ•°ï¼Œæœ‰äº›ç‚¹æ²¡æœ‰labelæè¿°ï¼Œä¸ºNULL
+    struct sample *samples;         //zw å…ƒç´ ç‚¹åˆ—è¡¨
+    double min, max;                //zw å…ƒç´ ä¸­çš„æœ€å¤§å€¼ï¼Œæœ€å°å€¼
 };
 
 #define SPARKLINE_NO_FLAGS 0
 #define SPARKLINE_FILL 1      /* Fill the area under the curve. */
 #define SPARKLINE_LOG_SCALE 2 /* Use logarithmic scale. */
 
-//zw ´´½¨Í¼ÏßĞòÁĞ½á¹¹Ìå
+//zw åˆ›å»ºå›¾çº¿åºåˆ—ç»“æ„ä½“
 struct sequence *createSparklineSequence(void);
-//zw ÔÚÍ¼ÏßĞòÁĞÖĞÌí¼ÓÒ»¸öĞÅÏ¢µã 
+//zw åœ¨å›¾çº¿åºåˆ—ä¸­æ·»åŠ ä¸€ä¸ªä¿¡æ¯ç‚¹ 
 void sparklineSequenceAddSample(struct sequence *seq, double value, char *label);
-//zw ÊÍ·ÅÍ¼ÏßĞòÁĞ
+//zw é‡Šæ”¾å›¾çº¿åºåˆ—
 void freeSparklineSequence(struct sequence *seq);
-//zw äÖÈ¾Í¼ÏßĞòÁĞÎªÒ»¸öÍ¼£¬ÆäÊµ¾ÍÊÇµÃµ½Ò»¸ö×Ö·û´®×é³ÉµÄÍ¼
+//zw æ¸²æŸ“å›¾çº¿åºåˆ—ä¸ºä¸€ä¸ªå›¾ï¼Œå…¶å®å°±æ˜¯å¾—åˆ°ä¸€ä¸ªå­—ç¬¦ä¸²ç»„æˆçš„å›¾
 sds sparklineRenderRange(sds output, struct sequence *seq, int rows, int offset, int len, int flags);
-//zw ·½·¨Í¬ÉÏ£¬Ö»ÊÇÉÙÒ»¸öÆ«ÒÆÁ¿
+//zw æ–¹æ³•åŒä¸Šï¼Œåªæ˜¯å°‘ä¸€ä¸ªåç§»é‡
 sds sparklineRender(sds output, struct sequence *seq, int columns, int rows, int flags);
 
 #endif /* __SPARKLINE_H */

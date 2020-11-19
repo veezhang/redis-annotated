@@ -37,7 +37,7 @@
 /* This helper function used by GETBIT / SETBIT parses the bit offset argument
  * making sure an error is returned if it is negative or if it overflows
  * Redis 512 MB limit for the string value. */
-//zw ¸ù¾İ²ÎÊı·µ»Øoffset£¬ ÆäÊµ¾ÍÊÇ·µ»Ø×Ö·û´®¶ÔÓ¦µÄÕûÊıÊıÖµ
+//zw æ ¹æ®å‚æ•°è¿”å›offsetï¼Œ å…¶å®å°±æ˜¯è¿”å›å­—ç¬¦ä¸²å¯¹åº”çš„æ•´æ•°æ•°å€¼
 static int getBitOffsetFromArgument(redisClient *c, robj *o, size_t *offset) {
     long long loffset;
     char *err = "bit offset is not an integer or out of range";
@@ -46,7 +46,7 @@ static int getBitOffsetFromArgument(redisClient *c, robj *o, size_t *offset) {
         return REDIS_ERR;
 
     /* Limit offset to 512MB in bytes */
-    //zw 512M = 512 * 1024 * 1024 * 8£¬ËùÒÔÕâÀïloffset >> 3
+    //zw 512M = 512 * 1024 * 1024 * 8ï¼Œæ‰€ä»¥è¿™é‡Œloffset >> 3
     if ((loffset < 0) || ((unsigned long long)loffset >> 3) >= (512*1024*1024))
     {
         addReplyError(c,err);
@@ -60,7 +60,7 @@ static int getBitOffsetFromArgument(redisClient *c, robj *o, size_t *offset) {
 /* Count number of bits set in the binary array pointed by 's' and long
  * 'count' bytes. The implementation of this function is required to
  * work with a input string length up to 512 MB. */
-//zw ¼ÆËãbitÎª1µÄ¸öÊı£¬ countÎª byte£¬ bitÎª count*3
+//zw è®¡ç®—bitä¸º1çš„ä¸ªæ•°ï¼Œ countä¸º byteï¼Œ bitä¸º count*3
 size_t redisPopcount(void *s, long count) {
     size_t bits = 0;
     unsigned char *p = s;
@@ -68,14 +68,14 @@ size_t redisPopcount(void *s, long count) {
     static const unsigned char bitsinbyte[256] = {0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,3,4,4,5,4,5,5,6,4,5,5,6,5,6,6,7,4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8};
 
     /* Count initial bytes not aligned to 32 bit. */
-    //zw ¼ÆÊı¿ªÊ¼²»ÊÇ32Îª¶ÔÆë·½Ê½µÄ×Ö½Ú
+    //zw è®¡æ•°å¼€å§‹ä¸æ˜¯32ä¸ºå¯¹é½æ–¹å¼çš„å­—èŠ‚
     while((unsigned long)p & 3 && count) {
         bits += bitsinbyte[*p++];
         count--;
     }
 
     /* Count bits 28 bytes at a time */
-    //zw Ò»´Î¼ÆËã28byte
+    //zw ä¸€æ¬¡è®¡ç®—28byte
     p4 = (uint32_t*)p;
     while(count>=28) {
         uint32_t aux1, aux2, aux3, aux4, aux5, aux6, aux7;
@@ -126,7 +126,7 @@ size_t redisPopcount(void *s, long count) {
  * no zero bit is found, it returns count*8 assuming the string is zero
  * padded on the right. However if 'bit' is 1 it is possible that there is
  * not a single set bit in the bitmap. In this special case -1 is returned. */
-//zw ·µ»ØµÚÒ»¸öÎª0(bit=0)»ò1(bit=1)µÄÎ»ÖÃ£¬ Èç¹ûÃ»ÓĞÕÒµ½0£¬¾Í·µ»Øcount*8£¬ Èç¹ûÃ»ÓĞÕÒµ½1£¬Ôò·µ»Ø-1
+//zw è¿”å›ç¬¬ä¸€ä¸ªä¸º0(bit=0)æˆ–1(bit=1)çš„ä½ç½®ï¼Œ å¦‚æœæ²¡æœ‰æ‰¾åˆ°0ï¼Œå°±è¿”å›count*8ï¼Œ å¦‚æœæ²¡æœ‰æ‰¾åˆ°1ï¼Œåˆ™è¿”å›-1
 long redisBitpos(void *s, unsigned long count, int bit) {
     unsigned long *l;
     unsigned char *c;
@@ -144,18 +144,18 @@ long redisBitpos(void *s, unsigned long count, int bit) {
      * aligned. */
 
     /* Skip initial bits not aligned to sizeof(unsigned long) byte by byte. */
-    //zw ¸ù¾İ×Ö½Ú¶ÔÆë£¬ÏÈ¹ıÂË²»¶ÔÆëµÄÇ°¼¸¸ö×Ö½Ú£¬ Ò»¸öbyteÒ»¸öµÄ±È½Ï
-    skipval = bit ? 0 : UCHAR_MAX;  //zw bit Îª1£¬skipvalµÄ¶ş½øÖÆÈ«Îª0£¬ Èç¹ûbit=0£¬¶øÇ°ÖµÈ«Îª1£¬ Èç¹û²»µÈÓÚskipval¾Í±íÊ¾ÕÒµ½ÁË
+    //zw æ ¹æ®å­—èŠ‚å¯¹é½ï¼Œå…ˆè¿‡æ»¤ä¸å¯¹é½çš„å‰å‡ ä¸ªå­—èŠ‚ï¼Œ ä¸€ä¸ªbyteä¸€ä¸ªçš„æ¯”è¾ƒ
+    skipval = bit ? 0 : UCHAR_MAX;  //zw bit ä¸º1ï¼Œskipvalçš„äºŒè¿›åˆ¶å…¨ä¸º0ï¼Œ å¦‚æœbit=0ï¼Œè€Œå‰å€¼å…¨ä¸º1ï¼Œ å¦‚æœä¸ç­‰äºskipvalå°±è¡¨ç¤ºæ‰¾åˆ°äº†
     c = (unsigned char*) s;
     while((unsigned long)c & (sizeof(*l)-1) && count) {
-        if (*c != skipval) break;   //zw ÕÒµ½ÁË
+        if (*c != skipval) break;   //zw æ‰¾åˆ°äº†
         c++;
         count--;
         pos += 8;
     }
 
     /* Skip bits with full word step. */
-    //zw Ã¿sizeof(unsigned long) ¸ö×Ö½Ú±È½Ï
+    //zw æ¯sizeof(unsigned long) ä¸ªå­—èŠ‚æ¯”è¾ƒ
     skipval = bit ? 0 : ULONG_MAX;
     l = (unsigned long*) c;
     while (count >= sizeof(*l)) {
@@ -172,11 +172,11 @@ long redisBitpos(void *s, unsigned long count, int bit) {
      *
      * Note that the loading is designed to work even when the bytes left
      * (count) are less than a full word. We pad it with zero on the right. */
-    //zw Èç¹ûÕÒµ½ÁË£¬×îºóÒ»¸öunsigned long±£ÁôÏÂÀ´£¬ ·ñÔòwordÈ«Îª0
+    //zw å¦‚æœæ‰¾åˆ°äº†ï¼Œæœ€åä¸€ä¸ªunsigned longä¿ç•™ä¸‹æ¥ï¼Œ å¦åˆ™wordå…¨ä¸º0
     c = (unsigned char*)l;
     for (j = 0; j < sizeof(*l); j++) {
         word <<= 8;
-        if (count) { //zw Èç¹û»¹Ã»Óöµ½½çÃæ£¬½«Æä±£´æµ½wordÖĞ£»Èç¹ûÒÑ¾­µ½½áÎ²ÁË£¬ÓÒ±ßµæ0
+        if (count) { //zw å¦‚æœè¿˜æ²¡é‡åˆ°ç•Œé¢ï¼Œå°†å…¶ä¿å­˜åˆ°wordä¸­ï¼›å¦‚æœå·²ç»åˆ°ç»“å°¾äº†ï¼Œå³è¾¹å«0
             word |= *c;
             c++;
             count--;
@@ -188,16 +188,16 @@ long redisBitpos(void *s, unsigned long count, int bit) {
      * return -1 to signal that there is not a single "1" in the whole
      * string. This can't happen when we are looking for "0" as we assume
      * that the right of the string is zero padded. */
-    //zw Èç¹ûÈ«²¿ÊÇ0£¬ÎÒÃÇĞèÒªÕÒ0£¬Ôò·µ»Ø-1
+    //zw å¦‚æœå…¨éƒ¨æ˜¯0ï¼Œæˆ‘ä»¬éœ€è¦æ‰¾0ï¼Œåˆ™è¿”å›-1
     if (bit == 1 && word == 0) return -1;
 
     /* Last word left, scan bit by bit. The first thing we need is to
      * have a single "1" set in the most significant position in an
      * unsigned long. We don't know the size of the long so we use a
      * simple trick. */
-    one = ULONG_MAX; /* All bits set to 1.              1111 1111 1111 1111 ¡¤¡¤¡¤¡¤¡¤¡¤ */
-    one >>= 1;       /* All bits set to 1 but the MSB.  0111 1111 1111 1111 ¡¤¡¤¡¤¡¤¡¤¡¤ */
-    one = ~one;      /* All bits set to 0 but the MSB.  1000 0000 0000 0000 ¡¤¡¤¡¤¡¤¡¤¡¤ */
+    one = ULONG_MAX; /* All bits set to 1.              1111 1111 1111 1111 Â·Â·Â·Â·Â·Â· */
+    one >>= 1;       /* All bits set to 1 but the MSB.  0111 1111 1111 1111 Â·Â·Â·Â·Â·Â· */
+    one = ~one;      /* All bits set to 0 but the MSB.  1000 0000 0000 0000 Â·Â·Â·Â·Â·Â· */
 
     while(one) {
         if (((one & word) != 0) == bit) return pos;
@@ -309,7 +309,7 @@ void bitopCommand(redisClient *c) {
     unsigned char *res = NULL; /* Resulting string. */
 
     /* Parse the operation name. */
-    //zw ¼¼ÇÉ£¬ÏÈ±È½ÏµÚÒ»¸ö×Ö·û£¬¿ÉÒÔ¿ìËÙ¹ıÂËÊÇ²»ÊÇ±¾Àà±ğ
+    //zw æŠ€å·§ï¼Œå…ˆæ¯”è¾ƒç¬¬ä¸€ä¸ªå­—ç¬¦ï¼Œå¯ä»¥å¿«é€Ÿè¿‡æ»¤æ˜¯ä¸æ˜¯æœ¬ç±»åˆ«
     if ((opname[0] == 'a' || opname[0] == 'A') && !strcasecmp(opname,"and"))
         op = BITOP_AND;
     else if((opname[0] == 'o' || opname[0] == 'O') && !strcasecmp(opname,"or"))

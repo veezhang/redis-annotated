@@ -2,8 +2,8 @@
  * in a Redis instance using the LATENCY command. Different latency
  * sources are monitored, like disk I/O, execution of commands, fork
  * system call, and so forth.
- *zw ÑÓÊ±¼àÌıÆ÷¿ÉÒÔ¶ÔRedisÖĞºÜ¶à¼òµ¥µÄ×ÊÔ´½øĞĞ¼àÌı£¬±ÈÈçI/O´ÅÅÌ²Ù×÷£¬Ö´ĞĞÒ»Ğ©Ö¸Áî£¬
- * fork´´½¨×ÓÏß³Ì²Ù×÷µÈµÄ¼àÌı¡£
+ *zw å»¶æ—¶ç›‘å¬å™¨å¯ä»¥å¯¹Redisä¸­å¾ˆå¤šç®€å•çš„èµ„æºè¿›è¡Œç›‘å¬ï¼Œæ¯”å¦‚I/Oç£ç›˜æ“ä½œï¼Œæ‰§è¡Œä¸€äº›æŒ‡ä»¤ï¼Œ
+ * forkåˆ›å»ºå­çº¿ç¨‹æ“ä½œç­‰çš„ç›‘å¬ã€‚
  * ----------------------------------------------------------------------------
  *
  * Copyright (c) 2014, Salvatore Sanfilippo <antirez at gmail dot com>
@@ -37,16 +37,16 @@
 #include "redis.h"
 
 /* Dictionary type for latency events. */
-//zw dict key±È½Ïº¯Êı
+//zw dict keyæ¯”è¾ƒå‡½æ•°
 int dictStringKeyCompare(void *privdata, const void *key1, const void *key2) {
     REDIS_NOTUSED(privdata);
     return strcmp(key1,key2) == 0;
 }
-//zw dict hash·½·¨
+//zw dict hashæ–¹æ³•
 unsigned int dictStringHash(const void *key) {
     return dictGenHashFunction(key, strlen(key));
 }
-//zw dictÊÍ·Å·½·¨
+//zw dicté‡Šæ”¾æ–¹æ³•
 void dictVanillaFree(void *privdata, void *val);
 
 dictType latencyTimeSeriesDictType = {
@@ -63,7 +63,7 @@ dictType latencyTimeSeriesDictType = {
 #ifdef __linux__
 /* Returns 1 if Transparent Huge Pages support is enabled in the kernel.
  * Otherwise (or if we are unable to check) 0 is returned. */
-//zw ÊÇ·ñÖ§³ÖÍ¸Ã÷´óÒ³(Transparent Huge Pages)
+//zw æ˜¯å¦æ”¯æŒé€æ˜å¤§é¡µ(Transparent Huge Pages)
 int THPIsEnabled(void) {
     char buf[1024];
 
@@ -90,7 +90,7 @@ int THPGetAnonHugePagesSize(void) {
 /* Latency monitor initialization. We just need to create the dictionary
  * of time series, each time serie is craeted on demand in order to avoid
  * having a fixed list to maintain. */
-//zw ÑÓÊ±¼àÌı³õÊ¼»¯²Ù×÷£¬ ´´½¨dict
+//zw å»¶æ—¶ç›‘å¬åˆå§‹åŒ–æ“ä½œï¼Œ åˆ›å»ºdict
 void latencyMonitorInit(void) {
     server.latency_events = dictCreate(&latencyTimeSeriesDictType,NULL);
 }
@@ -99,7 +99,7 @@ void latencyMonitorInit(void) {
  * This function is usually called via latencyAddSampleIfNeeded(), that
  * is a macro that only adds the sample if the latency is higher than
  * server.latency_monitor_threshold. */
-//zw Ìí¼ÓÑÓÊ±²ÉÑùµã
+//zw æ·»åŠ å»¶æ—¶é‡‡æ ·ç‚¹
 void latencyAddSample(char *event, mstime_t latency) {
     struct latencyTimeSeries *ts = dictFetchValue(server.latency_events,event);
     time_t now = time(NULL);
@@ -116,7 +116,7 @@ void latencyAddSample(char *event, mstime_t latency) {
 
     /* If the previous sample is in the same second, we update our old sample
      * if this latency is > of the old one, or just return. */
-    //zw Èç¹ûÇ°Ò»¸öÓëµ±Ç°µÄÊ±¼äÒ»Ñù
+    //zw å¦‚æœå‰ä¸€ä¸ªä¸å½“å‰çš„æ—¶é—´ä¸€æ ·
     prev = (ts->idx + LATENCY_TS_LEN - 1) % LATENCY_TS_LEN;
     if (ts->samples[prev].time == now) {
         if (latency > ts->samples[prev].latency)
@@ -124,7 +124,7 @@ void latencyAddSample(char *event, mstime_t latency) {
         return;
     }
     
-    //zw ¸³Öµ
+    //zw èµ‹å€¼
     ts->samples[ts->idx].time = time(NULL);
     ts->samples[ts->idx].latency = latency;
     if (latency > ts->max) ts->max = latency;
@@ -138,7 +138,7 @@ void latencyAddSample(char *event, mstime_t latency) {
  *
  * Note: this is O(N) even when event_to_reset is not NULL because makes
  * the code simpler and we have a small fixed max number of events. */
-//zw ÖØÉè£¬event_to_resetÎªNULLÔòÉ¾³ıËùÓĞ£¬·ñÔòÉ¾³ı¶ÔÓ¦µÄ
+//zw é‡è®¾ï¼Œevent_to_resetä¸ºNULLåˆ™åˆ é™¤æ‰€æœ‰ï¼Œå¦åˆ™åˆ é™¤å¯¹åº”çš„
 int latencyResetEvent(char *event_to_reset) {
     dictIterator *di;
     dictEntry *de;
@@ -164,7 +164,7 @@ int latencyResetEvent(char *event_to_reset) {
  * Check latency.h definition of struct latenctStat for more info.
  * If the specified event has no elements the structure is populate with
  * zero values. */
-//zw ·ÖÎöÄ³¸öÊ±¼äEventµÄÑÓÊ±½á¹û£¬½á¹ûĞÅÏ¢´æÈëlatencyStats½á¹¹ÌåÖĞ
+//zw åˆ†ææŸä¸ªæ—¶é—´Eventçš„å»¶æ—¶ç»“æœï¼Œç»“æœä¿¡æ¯å­˜å…¥latencyStatsç»“æ„ä½“ä¸­
 void analyzeLatencyForEvent(char *event, struct latencyStats *ls) {
     struct latencyTimeSeries *ts = dictFetchValue(server.latency_events,event);
     int j;
@@ -222,7 +222,7 @@ void analyzeLatencyForEvent(char *event, struct latencyStats *ls) {
 }
 
 /* Create a human readable report of latency events for this Redis instance. */
-//zw ´´½¨latency±¨±í
+//zw åˆ›å»ºlatencyæŠ¥è¡¨
 sds createLatencyReport(void) {
     sds report = sdsempty();
     int advise_better_vm = 0;       /* Better virtual machines. */
@@ -484,7 +484,7 @@ sds createLatencyReport(void) {
 
 /* latencyCommand() helper to produce a time-delay reply for all the samples
  * in memory for the specified time series. */
-//zw ·µ»Ø¿Í»§¶Ë¾ßÌåÄ³¸öÊÂ¼şµÄÑÓÊ±²ÉÑùµãĞòÁĞ
+//zw è¿”å›å®¢æˆ·ç«¯å…·ä½“æŸä¸ªäº‹ä»¶çš„å»¶æ—¶é‡‡æ ·ç‚¹åºåˆ—
 void latencyCommandReplyWithSamples(redisClient *c, struct latencyTimeSeries *ts) {
     void *replylen = addDeferredMultiBulkLength(c);
     int samples = 0, j;
@@ -503,7 +503,7 @@ void latencyCommandReplyWithSamples(redisClient *c, struct latencyTimeSeries *ts
 
 /* latencyCommand() helper to produce the reply for the LATEST subcommand,
  * listing the last latency sample for every event type registered so far. */
-//zw ·µ»Ø¿Í»§¶Ëµ±Ç°µÄÑÓÊ±²ÉÑùµãĞòÁĞ
+//zw è¿”å›å®¢æˆ·ç«¯å½“å‰çš„å»¶æ—¶é‡‡æ ·ç‚¹åºåˆ—
 void latencyCommandReplyWithLatestEvents(redisClient *c) {
     dictIterator *di;
     dictEntry *de;
@@ -525,7 +525,7 @@ void latencyCommandReplyWithLatestEvents(redisClient *c) {
 }
 
 #define LATENCY_GRAPH_COLS 80
-//zw ÓÃSparkelineÀ´ÏÔÊ¾¾ßÌåÄ³¸öÊÂ¼şµÄÑÓÊ±²ÉÑùµãĞòÁĞ
+//zw ç”¨Sparkelineæ¥æ˜¾ç¤ºå…·ä½“æŸä¸ªäº‹ä»¶çš„å»¶æ—¶é‡‡æ ·ç‚¹åºåˆ—
 sds latencyCommandGenSparkeline(char *event, struct latencyTimeSeries *ts) {
     int j;
     struct sequence *seq = createSparklineSequence();
@@ -577,7 +577,7 @@ sds latencyCommandGenSparkeline(char *event, struct latencyTimeSeries *ts) {
  * LATENCY DOCTOR: returns an human readable analysis of instance latency.
  * LATENCY GRAPH: provide an ASCII graph of the latency of the specified event.
  */
-//zw latencyÃüÁî´¦Àí
+//zw latencyå‘½ä»¤å¤„ç†
 void latencyCommand(redisClient *c) {
     struct latencyTimeSeries *ts;
 

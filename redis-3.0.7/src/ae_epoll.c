@@ -31,14 +31,14 @@
 
 #include <sys/epoll.h>
 
-//zw ×÷ÎªeventLoop½á¹¹µÄapidata´æ´¢
+//zw ä½œä¸ºeventLoopç»“æž„çš„apidataå­˜å‚¨
 typedef struct aeApiState {
-    int epfd;                   //zw epoll_create·µ»Ø
-    struct epoll_event *events; //zw ´æµÄÊÇepoll_wait·µ»ØºóµÃµ½µÄÊÂ¼þÁÐ±í
+    int epfd;                   //zw epoll_createè¿”å›ž
+    struct epoll_event *events; //zw å­˜çš„æ˜¯epoll_waitè¿”å›žåŽå¾—åˆ°çš„äº‹ä»¶åˆ—è¡¨
 } aeApiState;
 
 static int aeApiCreate(aeEventLoop *eventLoop) {
-    //zw ·ÖÅäÄÚ´æ
+    //zw åˆ†é…å†…å­˜
     aeApiState *state = zmalloc(sizeof(aeApiState));
 
     if (!state) return -1;
@@ -58,7 +58,7 @@ static int aeApiCreate(aeEventLoop *eventLoop) {
     return 0;
 }
 
-//zw ÖØÉè×î´ó¼àÌýÊý´óÐ¡
+//zw é‡è®¾æœ€å¤§ç›‘å¬æ•°å¤§å°
 static int aeApiResize(aeEventLoop *eventLoop, int setsize) {
     aeApiState *state = eventLoop->apidata;
 
@@ -66,7 +66,7 @@ static int aeApiResize(aeEventLoop *eventLoop, int setsize) {
     return 0;
 }
 
-//zw »ØÊÕÄÚ´æ
+//zw å›žæ”¶å†…å­˜
 static void aeApiFree(aeEventLoop *eventLoop) {
     aeApiState *state = eventLoop->apidata;
 
@@ -75,7 +75,7 @@ static void aeApiFree(aeEventLoop *eventLoop) {
     zfree(state);
 }
 
-//zw Ìí¼Óµ½EventLoop
+//zw æ·»åŠ åˆ°EventLoop
 static int aeApiAddEvent(aeEventLoop *eventLoop, int fd, int mask) {
     aeApiState *state = eventLoop->apidata;
     struct epoll_event ee;
@@ -94,7 +94,7 @@ static int aeApiAddEvent(aeEventLoop *eventLoop, int fd, int mask) {
     return 0;
 }
 
-//zw É¾³ýÊÂ¼þ
+//zw åˆ é™¤äº‹ä»¶
 static void aeApiDelEvent(aeEventLoop *eventLoop, int fd, int delmask) {
     aeApiState *state = eventLoop->apidata;
     struct epoll_event ee;
@@ -124,7 +124,7 @@ static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp) {
     if (retval > 0) {
         int j;
         
-        //zw È«²¿±£´æµ½ eventLoop->fired ÖÐ
+        //zw å…¨éƒ¨ä¿å­˜åˆ° eventLoop->fired ä¸­
         numevents = retval;
         for (j = 0; j < numevents; j++) {
             int mask = 0;
@@ -141,7 +141,7 @@ static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp) {
     return numevents;
 }
 
-//zw »ñÈ¡APIÃû×Ö£¬Èçepoll·µ»Øepoll
+//zw èŽ·å–APIåå­—ï¼Œå¦‚epollè¿”å›žepoll
 static char *aeApiName(void) {
     return "epoll";
 }
