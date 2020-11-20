@@ -60,7 +60,7 @@
  * prevented: a hash table is still allowed to grow if the ratio between
  * the number of elements and the buckets > dict_force_resize_ratio. */
 static int dict_can_resize = 1;
-static unsigned int dict_force_resize_ratio = 5;
+static unsigned int dict_force_resize_ratio = 5; // 强制调整大小比例 used/size >= 5:1
 
 /* -------------------------- private prototypes ---------------------------- */
 
@@ -132,6 +132,7 @@ int _dictInit(dict *d, dictType *type,
 
 /* Resize the table to the minimal size that contains all the elements,
  * but with the invariant of a USED/BUCKETS ratio near to <= 1 */
+// dictResize 将表的大小调整为包含所有元素的最小大小， used/size 接近 <= 1
 int dictResize(dict *d)
 {
     unsigned long minimal;
@@ -144,20 +145,25 @@ int dictResize(dict *d)
 }
 
 /* Expand or create the hash table */
+// Expand 扩容
 int dictExpand(dict *d, unsigned long size)
 {
     /* the size is invalid if it is smaller than the number of
      * elements already inside the hash table */
+    // 应该 used < size
     if (dictIsRehashing(d) || d->ht[0].used > size)
         return DICT_ERR;
 
     dictht n; /* the new hash table */
+    // 计算真实的 size ， 2的 N 次方
     unsigned long realsize = _dictNextPower(size);
 
     /* Rehashing to the same table size is not useful. */
+    // 不应该 rehash 到相同的 size
     if (realsize == d->ht[0].size) return DICT_ERR;
 
     /* Allocate the new hash table and initialize all pointers to NULL */
+    // 初始化 dictht
     n.size = realsize;
     n.sizemask = realsize-1;
     n.table = zcalloc(realsize*sizeof(dictEntry*));
@@ -165,12 +171,14 @@ int dictExpand(dict *d, unsigned long size)
 
     /* Is this the first initialization? If so it's not really a rehashing
      * we just set the first hash table so that it can accept keys. */
+    // 第一次初始化
     if (d->ht[0].table == NULL) {
         d->ht[0] = n;
         return DICT_OK;
     }
 
     /* Prepare a second hash table for incremental rehashing */
+    // 设置到 ht[1] ，后续可以开始开始 rehash
     d->ht[1] = n;
     d->rehashidx = 0;
     return DICT_OK;
@@ -185,6 +193,7 @@ int dictExpand(dict *d, unsigned long size)
  * guaranteed that this function will rehash even a single bucket, since it
  * will visit at max N*10 empty buckets in total, otherwise the amount of
  * work it does would be unbound and the function may block for a long time. */
+// dictRehash 执行 n 步渐进式 rehash 。 如果还有 key 需要迁移则返回 1 ,否则返回 0 .
 int dictRehash(dict *d, int n) {
     int empty_visits = n*10; /* Max number of empty buckets to visit. */
     if (!dictIsRehashing(d)) return 0;
@@ -195,18 +204,21 @@ int dictRehash(dict *d, int n) {
         /* Note that rehashidx can't overflow as we are sure there are more
          * elements because ht[0].used != 0 */
         assert(d->ht[0].size > (unsigned long)d->rehashidx);
+        // 找到第一个不为 NULL 的 bucket
         while(d->ht[0].table[d->rehashidx] == NULL) {
             d->rehashidx++;
             if (--empty_visits == 0) return 1;
         }
         de = d->ht[0].table[d->rehashidx];
         /* Move all the keys in this bucket from the old to the new hash HT */
+        // 将对应久桶中的数据全部迁移到新桶中
         while(de) {
             uint64_t h;
 
             nextde = de->next;
             /* Get the index in the new hash table */
             h = dictHashKey(d, de->key) & d->ht[1].sizemask;
+            // 头插法
             de->next = d->ht[1].table[h];
             d->ht[1].table[h] = de;
             d->ht[0].used--;
@@ -218,6 +230,7 @@ int dictRehash(dict *d, int n) {
     }
 
     /* Check if we already rehashed the whole table... */
+    // 所有的都迁移完成，返回 0
     if (d->ht[0].used == 0) {
         zfree(d->ht[0].table);
         d->ht[0] = d->ht[1];
@@ -227,6 +240,7 @@ int dictRehash(dict *d, int n) {
     }
 
     /* More to rehash... */
+    // 还需要，则返回 1
     return 1;
 }
 
@@ -240,6 +254,7 @@ long long timeInMilliseconds(void) {
 /* Rehash in ms+"delta" milliseconds. The value of "delta" is larger 
  * than 0, and is smaller than 1 in most cases. The exact upper bound 
  * depends on the running time of dictRehash(d,100).*/
+// dictRehashMilliseconds 每次 rehash 100 个槽，通常总时间 < ms + 1
 int dictRehashMilliseconds(dict *d, int ms) {
     long long start = timeInMilliseconds();
     int rehashes = 0;
@@ -259,6 +274,7 @@ int dictRehashMilliseconds(dict *d, int ms) {
  * This function is called by common lookup or update operations in the
  * dictionary so that the hash table automatically migrates from H1 to H2
  * while it is actively used. */
+// _dictRehashStep 在查询或者更新的时候，调用此函数，将活跃的 dict 进行迁移
 static void _dictRehashStep(dict *d) {
     if (d->iterators == 0) dictRehash(d,1);
 }
@@ -308,7 +324,9 @@ dictEntry *dictAddRaw(dict *d, void *key, dictEntry **existing)
      * Insert the element in top, with the assumption that in a database
      * system it is more likely that recently added entries are accessed
      * more frequently. */
+    // 根据情况看是放到 ht[1] 还是 ht[0]
     ht = dictIsRehashing(d) ? &d->ht[1] : &d->ht[0];
+    // 头插法
     entry = zmalloc(sizeof(*entry));
     entry->next = ht->table[index];
     ht->table[index] = entry;
@@ -952,18 +970,24 @@ unsigned long dictScan(dict *d,
 /* ------------------------- private functions ------------------------------ */
 
 /* Expand the hash table if needed */
+// _dictExpandIfNeeded 扩容
 static int _dictExpandIfNeeded(dict *d)
 {
     /* Incremental rehashing already in progress. Return. */
+    // 已经在扩容
     if (dictIsRehashing(d)) return DICT_OK;
 
     /* If the hash table is empty expand it to the initial size. */
+    // 还没有初始化，默认初始化 DICT_HT_INITIAL_SIZE(4)
     if (d->ht[0].size == 0) return dictExpand(d, DICT_HT_INITIAL_SIZE);
 
     /* If we reached the 1:1 ratio, and we are allowed to resize the hash
      * table (global setting) or we should avoid it but the ratio between
      * elements/buckets is over the "safe" threshold, we resize doubling
      * the number of buckets. */
+    // 扩容条件：
+    // 1. 没有子进程处理 AOF, RDB, Module 产生的， 使用比例已经达到了 used/size >= 1:1
+    // 2. 哪怕有子进程，比例达到 used/size >= 5:1
     if (d->ht[0].used >= d->ht[0].size &&
         (dict_can_resize ||
          d->ht[0].used/d->ht[0].size > dict_force_resize_ratio))

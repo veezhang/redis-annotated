@@ -38,6 +38,8 @@
 #ifndef __DICT_H
 #define __DICT_H
 
+// 字典
+
 #define DICT_OK 0
 #define DICT_ERR 1
 
@@ -52,7 +54,7 @@ typedef struct dictEntry {
         int64_t s64;
         double d;
     } v;
-    struct dictEntry *next;
+    struct dictEntry *next; // 下一个数据，拉链法解决冲突
 } dictEntry;
 
 typedef struct dictType {
@@ -67,17 +69,18 @@ typedef struct dictType {
 /* This is our hash table structure. Every dictionary has two of this as we
  * implement incremental rehashing, for the old to the new table. */
 typedef struct dictht {
-    dictEntry **table;
-    unsigned long size;
-    unsigned long sizemask;
-    unsigned long used;
+    dictEntry **table;              // 桶，bucket ，是一个 size 大小的 dictEntry * 数组
+    unsigned long size;             // 大小， 2 的 N 次方
+    unsigned long sizemask;         // size - 1
+    unsigned long used;             // 已经使用了多少
 } dictht;
 
+// 字典结构
 typedef struct dict {
     dictType *type;
     void *privdata;
-    dictht ht[2];
-    long rehashidx; /* rehashing not in progress if rehashidx == -1 */
+    dictht ht[2];           // ht[0] 正常下使用，ht[1] rehash 时候使用，采用的渐进式 rehash
+    long rehashidx; /* rehashing not in progress if rehashidx == -1 */ // rehash 的下标 ，!= -1 表示在 rehash 过程中
     unsigned long iterators; /* number of iterators currently running */
 } dict;
 
@@ -98,7 +101,7 @@ typedef void (dictScanFunction)(void *privdata, const dictEntry *de);
 typedef void (dictScanBucketFunction)(void *privdata, dictEntry **bucketref);
 
 /* This is the initial size of every hash table */
-#define DICT_HT_INITIAL_SIZE     4
+#define DICT_HT_INITIAL_SIZE     4 // 默认初始化数目
 
 /* ------------------------------- Macros ------------------------------------*/
 #define dictFreeVal(d, entry) \

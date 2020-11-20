@@ -31,6 +31,8 @@
 #ifndef __ADLIST_H__
 #define __ADLIST_H__
 
+// 通用的双向链表
+
 /* Node, List, and Iterator are the only data structures used currently. */
 
 typedef struct listNode {

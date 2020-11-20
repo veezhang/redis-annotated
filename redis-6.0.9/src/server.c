@@ -1442,6 +1442,7 @@ void tryResizeHashTables(int dbid) {
  *
  * The function returns 1 if some rehashing was performed, otherwise 0
  * is returned. */
+// incrementallyRehash 渐进式 rehash
 int incrementallyRehash(int dbid) {
     /* Keys dictionary */
     if (dictIsRehashing(server.db[dbid].dict)) {
@@ -1462,15 +1463,19 @@ int incrementallyRehash(int dbid) {
  * memory pages are copied). The goal of this function is to update the ability
  * for dict.c to resize the hash tables accordingly to the fact we have an
  * active fork child running. */
+// 更新 dict 调整大小的策略，具体策略见 _dictExpandIfNeeded
 void updateDictResizePolicy(void) {
     if (!hasActiveChildProcess())
+        // 如果没有激活的子进程，used/size >= 1:1
         dictEnableResize();
     else
+        // 如果没有激活的子进程，used/size >= 5:1
         dictDisableResize();
 }
 
 /* Return true if there are no active children processes doing RDB saving,
  * AOF rewriting, or some side process spawned by a loaded module. */
+// 子进程： AOF, RDB, Module 产生的
 int hasActiveChildProcess() {
     return server.rdb_child_pid != -1 ||
            server.aof_child_pid != -1 ||
@@ -1690,6 +1695,7 @@ void clientsCron(void) {
 /* This function handles 'background' operations we are required to do
  * incrementally in Redis databases, such as active key expiring, resizing,
  * rehashing. */
+// databasesCron databases 定期任务
 void databasesCron(void) {
     /* Expire keys by random sampling. Not required for slaves
      * as master will synthesize DELs for us. */
@@ -1726,6 +1732,7 @@ void databasesCron(void) {
         }
 
         /* Rehash */
+        // 重hash
         if (server.activerehashing) {
             for (j = 0; j < dbs_per_call; j++) {
                 int work_done = incrementallyRehash(rehash_db);
