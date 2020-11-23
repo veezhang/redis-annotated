@@ -355,7 +355,9 @@ extern int configOOMScoreAdjValuesDefaults[CONFIG_OOM_COUNT];
 /* Anti-warning macro... */
 #define UNUSED(V) ((void) V)
 
+// zskiplist 最大层数，最多可以容纳 2^32 个元素
 #define ZSKIPLIST_MAXLEVEL 32 /* Should be enough for 2^64 elements */
+// 提升到上一层的概率 0.25
 #define ZSKIPLIST_P 0.25      /* Skiplist P = 1/4 */
 
 /* Append only defines */
@@ -901,24 +903,24 @@ struct sharedObjectsStruct {
 
 /* ZSETs use a specialized version of Skiplists */
 typedef struct zskiplistNode {
-    sds ele;
-    double score;
-    struct zskiplistNode *backward;
+    sds ele;                                // 元素，存放该节点的数据，旧版本为 robj *obj
+    double score;                           // 分数，zset通过分数对数据升序排列
+    struct zskiplistNode *backward;         // 指向链表上一个节点的指针，即后向指针
     struct zskiplistLevel {
-        struct zskiplistNode *forward;
+        struct zskiplistNode *forward;      // 前进指针
         unsigned long span;
-    } level[];
+    } level[];                              // 多层连接指针
 } zskiplistNode;
 
 typedef struct zskiplist {
-    struct zskiplistNode *header, *tail;
-    unsigned long length;
-    int level;
+    struct zskiplistNode *header, *tail;    // 头指针和尾指针
+    unsigned long length;                   // 跳表的长度
+    int level;                              // 跳表的层数
 } zskiplist;
 
 typedef struct zset {
-    dict *dict;
-    zskiplist *zsl;
+    dict *dict;                             // 字典，维护元素值和分值的映射关系
+    zskiplist *zsl;                         // 跳跃表，按分值对元素值排序序
 } zset;
 
 typedef struct clientBufferLimitsConfig {

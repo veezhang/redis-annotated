@@ -84,6 +84,7 @@ zskiplist *zslCreate(void) {
     zsl = zmalloc(sizeof(*zsl));
     zsl->level = 1;
     zsl->length = 0;
+    // zskiplist 最大层数，最多可以容纳 2^32 个元素
     zsl->header = zslCreateNode(ZSKIPLIST_MAXLEVEL,0,NULL);
     for (j = 0; j < ZSKIPLIST_MAXLEVEL; j++) {
         zsl->header->level[j].forward = NULL;
@@ -119,8 +120,10 @@ void zslFree(zskiplist *zsl) {
  * The return value of this function is between 1 and ZSKIPLIST_MAXLEVEL
  * (both inclusive), with a powerlaw-alike distribution where higher
  * levels are less likely to be returned. */
+// zslRandomLevel 生成随机的层
 int zslRandomLevel(void) {
     int level = 1;
+    // 25% 的概率提升一层
     while ((random()&0xFFFF) < (ZSKIPLIST_P * 0xFFFF))
         level += 1;
     return (level<ZSKIPLIST_MAXLEVEL) ? level : ZSKIPLIST_MAXLEVEL;
@@ -1166,6 +1169,7 @@ unsigned long zsetLength(const robj *zobj) {
     return length;
 }
 
+// zset 底层编码转换，支持编码 OBJ_ENCODING_ZIPLIST, OBJ_ENCODING_SKIPLIST
 void zsetConvert(robj *zobj, int encoding) {
     zset *zs;
     zskiplistNode *node, *next;
@@ -1240,10 +1244,12 @@ void zsetConvert(robj *zobj, int encoding) {
 /* Convert the sorted set object into a ziplist if it is not already a ziplist
  * and if the number of elements and the maximum element size is within the
  * expected ranges. */
+// 如果有必要，则将 zset 转换为 Ziplist 编码
 void zsetConvertToZiplistIfNeeded(robj *zobj, size_t maxelelen) {
     if (zobj->encoding == OBJ_ENCODING_ZIPLIST) return;
     zset *zset = zobj->ptr;
 
+    // 如果元素个数 <= zset_max_ziplist_entries (默认 128) 并且 元素最大长度 <= zset_max_ziplist_value (默认 64)
     if (zset->zsl->length <= server.zset_max_ziplist_entries &&
         maxelelen <= server.zset_max_ziplist_value)
             zsetConvert(zobj,OBJ_ENCODING_ZIPLIST);
@@ -1360,6 +1366,8 @@ int zsetAdd(robj *zobj, double score, sds ele, int *flags, double *newscore) {
             zobj->ptr = zzlInsert(zobj->ptr,ele,score);
             if (zzlLength(zobj->ptr) > server.zset_max_ziplist_entries ||
                 sdslen(ele) > server.zset_max_ziplist_value)
+                // 如果元素个数 > zset_max_ziplist_entries (默认 128) 或 元素最大长度 <= zset_max_ziplist_value (默认 64)
+                // 则转换为 skiplist
                 zsetConvert(zobj,OBJ_ENCODING_SKIPLIST);
             if (newscore) *newscore = score;
             *flags |= ZADD_ADDED;
